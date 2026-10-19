@@ -1,0 +1,2179 @@
+<!doctype html><html lang="en"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>iDisciple</title>
+<style>
+:root{
+  --bg:#f6f4ee;
+  --surface:#ffffff;
+  --surface-2:#eeece2;
+  --ink:#22301f;
+  --ink-dim:#5c6b57;
+  --line:#d9d4c4;
+  --accent:#3f6b4a;
+  --accent-ink:#ffffff;
+  --gold:#b9873a;
+  --gold-soft:#f1e3c8;
+  --learn:#3f6b4a;
+  --practice:#8a6a2f;
+  --character:#5a4a8a;
+  --learn-bg:#e7efe6;
+  --practice-bg:#f3ead6;
+  --character-bg:#ece8f5;
+  --shadow: 0 1px 2px rgba(30,30,20,0.06), 0 6px 20px rgba(30,30,20,0.06);
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161a14;
+    --surface:#1f251c;
+    --surface-2:#242a1f;
+    --ink:#e9ecE3;
+    --ink-dim:#a6b09d;
+    --line:#333b2c;
+    --accent:#7fb388;
+    --accent-ink:#12180f;
+    --gold:#e0b567;
+    --gold-soft:#3a331f;
+    --learn:#7fb388;
+    --practice:#e0b567;
+    --character:#b3a3e6;
+    --learn-bg:#20281f;
+    --practice-bg:#2b2519;
+    --character-bg:#241f30;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161a14;
+  --surface:#1f251c;
+  --surface-2:#242a1f;
+  --ink:#e9ecE3;
+  --ink-dim:#a6b09d;
+  --line:#333b2c;
+  --accent:#7fb388;
+  --accent-ink:#12180f;
+  --gold:#e0b567;
+  --gold-soft:#3a331f;
+  --learn:#7fb388;
+  --practice:#e0b567;
+  --character:#b3a3e6;
+  --learn-bg:#20281f;
+  --practice-bg:#2b2519;
+  --character-bg:#241f30;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+}
+
+*{box-sizing:border-box;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Karla', -apple-system, BlinkMacSystemFont, sans-serif;
+  padding:0 16px;
+  padding-block:28px 60px;
+}
+h1,h2,h3,.display{ font-family:'Fraunces', Georgia, serif; }
+.wrap{ max-width:980px; margin:0 auto; }
+
+.lang-row{ display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+.lang-btn{
+  display:inline-flex; align-items:center; gap:6px; padding:6px 13px; border-radius:999px;
+  border:1px solid var(--line); background:var(--surface); color:var(--ink-dim);
+  font-family:'Karla',sans-serif; font-weight:700; font-size:12.5px; cursor:pointer;
+  box-shadow:var(--shadow);
+}
+.lang-btn span.flag{ font-size:15px; line-height:1; }
+.lang-btn:hover{ background:var(--surface-2); }
+.lang-btn.active{ background:var(--gold-soft); color:var(--ink); border-color:var(--gold); }
+
+/* Farsi reads right-to-left; keep the language switcher itself always left-to-right
+   (flag + code order stays readable) but mirror the main text content. */
+:root[dir="rtl"] .lede,
+:root[dir="rtl"] .overview-hint,
+:root[dir="rtl"] footer.note,
+:root[dir="rtl"] .next-card .division,
+:root[dir="rtl"] .next-card .item-title,
+:root[dir="rtl"] .res-line,
+:root[dir="rtl"] .item-title-row,
+:root[dir="rtl"] .stage-name,
+:root[dir="rtl"] .record-card label,
+:root[dir="rtl"] input,
+:root[dir="rtl"] textarea{ direction:rtl; text-align:right; }
+:root[dir="rtl"] .lang-row{ direction:ltr; }
+:root[dir="rtl"] .next-card .done-check{ direction:rtl; }
+
+header.top{ margin-bottom:28px; }
+.header-row{ display:flex; align-items:flex-start; gap:26px; flex-wrap:wrap; }
+.intro{ flex:1 1 380px; min-width:0; }
+.eyebrow{
+  font-size:12px; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--accent); font-weight:700; margin-bottom:6px;
+}
+h1{ font-size:clamp(28px,5vw,40px); font-weight:600; margin:0 0 10px; text-wrap:balance; }
+.lede{ color:var(--ink-dim); font-size:15.5px; line-height:1.6; max-width:62ch; }
+.lede b{ color:var(--ink); font-weight:600; }
+
+/* Session record card */
+.record-card{
+  flex:0 0 260px; width:260px; background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--radius); box-shadow:var(--shadow); padding:16px;
+}
+@media (max-width:760px){ .record-card{ flex:1 1 100%; width:100%; } }
+.record-title{ font-family:'Fraunces',serif; font-weight:600; font-size:15px; margin-bottom:10px; }
+.record-card label{
+  display:block; font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+  color:var(--ink-dim); font-weight:700; margin-top:10px;
+}
+.record-card label:first-of-type{ margin-top:0; }
+.record-card input, .record-card textarea{
+  display:block; width:100%; margin-top:4px; font-family:'Karla',sans-serif; font-size:13.5px;
+  padding:7px 9px; border:1px solid var(--line); border-radius:8px; background:var(--bg);
+  color:var(--ink);
+}
+.record-card textarea{ min-height:58px; resize:vertical; font-family:inherit; line-height:1.4; }
+.record-card input:focus, .record-card textarea:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+.print-btn{
+  margin-top:14px; width:100%; padding:10px 12px; border:none; border-radius:9px;
+  background:var(--accent); color:var(--accent-ink); font-family:'Karla',sans-serif; font-weight:700;
+  font-size:13.5px; cursor:pointer;
+}
+.print-btn:hover{ filter:brightness(1.08); }
+.print-btn:disabled{ opacity:.6; cursor:default; }
+.print-status{ margin-top:8px; font-size:12px; color:var(--ink-dim); min-height:14px; }
+.print-status.error{ color:#b0432f; }
+
+@media print{
+  .print-btn{ display:none !important; }
+  body{ background:#fff; padding:0; }
+  *{ box-shadow:none !important; color-adjust:exact; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .col, .next-card, .item, tr{ break-inside:avoid; }
+  .record-card{ border:1px solid #999; }
+  .stage-ring{ display:none; }
+}
+
+/* Path / stage selector */
+.path{
+  display:flex; gap:0; margin:28px 0 22px; position:relative;
+  border:1px solid var(--line); border-radius:var(--radius);
+  background:var(--surface); box-shadow:var(--shadow); overflow:hidden;
+}
+.stage-btn{
+  flex:1; min-width:0; padding:14px 10px; text-align:center; cursor:pointer;
+  background:transparent; border:none; border-right:1px solid var(--line);
+  font-family:'Karla',sans-serif; color:var(--ink-dim);
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  transition:background .15s ease;
+}
+.stage-btn:last-child{ border-right:none; }
+.stage-btn:hover{ background:var(--surface-2); }
+.stage-btn.active{ background:var(--gold-soft); color:var(--ink); }
+.stage-name{ font-family:'Fraunces',serif; font-weight:600; font-size:15px; }
+.stage-ring{
+  width:34px; height:34px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; font-variant-numeric:tabular-nums;
+  background:conic-gradient(var(--accent) calc(var(--pct,0)*1%), var(--line) 0);
+}
+.stage-ring::after{
+  content:attr(data-pct)"%"; width:26px; height:26px; border-radius:50%;
+  background:var(--surface); display:flex; align-items:center; justify-content:center;
+}
+.stage-btn.active .stage-ring::after{ background:var(--gold-soft); }
+
+/* Next steps */
+.next-steps{ margin-bottom:30px; }
+.section-title{ font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); font-weight:700; margin:0 0 12px; }
+.next-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+@media (max-width:760px){ .next-grid{ grid-template-columns:1fr; } }
+.next-card{
+  border-radius:var(--radius); padding:16px; box-shadow:var(--shadow);
+  border:1px solid var(--line); background:var(--surface);
+  border-top:4px solid var(--card-color);
+}
+.next-card .division{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; font-weight:700; color:var(--card-color); margin-bottom:6px; }
+.next-card .item-title{ font-family:'Fraunces',serif; font-size:18px; font-weight:600; margin:0 0 10px; }
+.next-card .res{ font-size:13px; color:var(--ink-dim); line-height:1.55; }
+.next-card .res b{ color:var(--ink); font-weight:600; }
+.next-card .done-check{ display:inline-flex; align-items:center; gap:8px; margin-top:12px; font-size:13px; cursor:pointer; user-select:none; }
+.next-card.all-done{ display:flex; align-items:center; justify-content:center; text-align:center; color:var(--ink-dim); font-size:14px; padding:26px 16px; }
+
+/* Columns */
+.columns{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; align-items:start; }
+@media (max-width:760px){ .columns{ grid-template-columns:1fr; } }
+.col{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); overflow:hidden;
+}
+.col-head{ padding:14px 16px; border-bottom:1px solid var(--line); }
+.col-head .label{ font-family:'Fraunces',serif; font-weight:600; font-size:17px; }
+.col-head .sub{ font-size:12px; color:var(--ink-dim); margin-top:2px; }
+.col.learn .col-head{ background:var(--learn-bg); }
+.col.practice .col-head{ background:var(--practice-bg); }
+.col.character .col-head{ background:var(--character-bg); }
+.col-body{ padding:6px 8px; }
+
+.item{ border-bottom:1px solid var(--line); }
+.item:last-child{ border-bottom:none; }
+.item-row{
+  display:flex; align-items:flex-start; gap:10px; padding:10px 8px; cursor:pointer;
+}
+.item-row:hover{ background:var(--surface-2); }
+.chk{
+  margin-top:2px; width:18px; height:18px; flex:none; border-radius:5px;
+  border:2px solid var(--line); appearance:none; cursor:pointer; position:relative;
+  background:var(--surface);
+}
+.chk:checked{ background:var(--accent); border-color:var(--accent); }
+.chk:checked::after{
+  content:""; position:absolute; left:4px; top:0px; width:5px; height:10px;
+  border:solid var(--accent-ink); border-width:0 2px 2px 0; transform:rotate(45deg);
+}
+.item-title-row{ flex:1; font-size:14.5px; line-height:1.4; }
+.item.checked .item-title-row{ color:var(--ink-dim); text-decoration:line-through; text-decoration-color:var(--line); }
+.caret{ font-size:11px; color:var(--ink-dim); transition:transform .15s ease; margin-top:3px; }
+.item.open .caret{ transform:rotate(90deg); }
+.item-detail{ display:none; padding:0 10px 12px 36px; font-size:13px; color:var(--ink-dim); line-height:1.6; }
+.item.open .item-detail{ display:block; }
+.item-detail .res-line{ margin-bottom:6px; }
+.item-detail b{ color:var(--ink); font-weight:600; }
+.tbd{ font-style:italic; opacity:.85; }
+.res-line a{ color:var(--accent); text-decoration:underline; text-decoration-color:var(--line); text-underline-offset:2px; }
+.res-line a:hover{ text-decoration-color:var(--accent); }
+.next-card .res-line a{ color:inherit; font-weight:600; }
+
+footer.note{ margin-top:36px; font-size:12.5px; color:var(--ink-dim); line-height:1.7; border-top:1px solid var(--line); padding-top:18px; }
+footer.note b{ color:var(--ink); }
+
+/* Overview */
+.overview-wrap{ margin-bottom:34px; }
+.overview-hint{ font-size:12.5px; color:var(--ink-dim); margin:-6px 0 12px; }
+.table-scroll{ overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); background:var(--surface); }
+.overview-table{ border-collapse:collapse; width:100%; min-width:680px; }
+.overview-table th, .overview-table td{ border:1px solid var(--line); padding:10px 12px; vertical-align:top; text-align:left; }
+.overview-table thead th{ background:var(--surface-2); font-family:'Fraunces',serif; font-weight:600; font-size:14px; cursor:pointer; }
+.overview-table thead th.corner{ background:var(--surface); cursor:default; }
+.overview-table thead th:not(.corner):hover{ background:var(--gold-soft); }
+.overview-table .row-label{ font-family:'Fraunces',serif; font-weight:600; font-size:13.5px; white-space:nowrap; background:var(--surface-2); }
+.overview-table td{ font-size:12.5px; }
+.mini-item{ display:flex; align-items:flex-start; gap:6px; padding:3px 0; cursor:pointer; line-height:1.35; }
+.mini-item input{ margin-top:2px; width:13px; height:13px; flex:none; }
+.mini-item.checked span{ color:var(--ink-dim); text-decoration:line-through; text-decoration-color:var(--line); }
+
+/* View tabs (Pathway | Courses) */
+[hidden]{ display:none !important; }
+.view-tabs{
+  display:inline-flex; gap:0; margin:0 0 22px; border:1px solid var(--line); border-radius:999px;
+  background:var(--surface); box-shadow:var(--shadow); overflow:hidden;
+}
+.view-tabs button{
+  padding:9px 22px; border:none; background:transparent; color:var(--ink-dim); cursor:pointer;
+  font-family:'Fraunces',serif; font-weight:600; font-size:15px;
+}
+.view-tabs button + button{ border-inline-start:1px solid var(--line); }
+.view-tabs button:hover{ background:var(--surface-2); }
+.view-tabs button.active{ background:var(--gold-soft); color:var(--ink); }
+
+/* Course library */
+.course-controls{ display:flex; flex-direction:column; gap:8px; margin:0 0 18px; }
+.frow{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.flabel{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; font-weight:700; color:var(--ink-dim); min-width:92px; }
+.fchip{
+  padding:5px 12px; border-radius:999px; border:1px solid var(--line); background:var(--surface);
+  color:var(--ink-dim); font-family:'Karla',sans-serif; font-weight:700; font-size:12.5px; cursor:pointer;
+}
+.fchip:hover{ background:var(--surface-2); }
+.fchip.active{ background:var(--gold-soft); color:var(--ink); border-color:var(--gold); }
+.msel{
+  padding:5px 10px; border-radius:8px; border:1px solid var(--line); background:var(--surface);
+  color:var(--ink); font-family:'Karla',sans-serif; font-size:13px;
+}
+.item-banner{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:10px 14px; border:1px solid var(--gold); background:var(--gold-soft); border-radius:var(--radius);
+  font-weight:700; font-size:14px;
+}
+.course-list{ display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+.no-courses{ padding:26px 16px; text-align:center; color:var(--ink-dim); border:1px dashed var(--line); border-radius:var(--radius); }
+.course-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:16px 18px; min-width:0;
+}
+.course-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+.course-id{ flex:1 1 300px; min-width:0; }
+.course-card h3{ font-size:19px; font-weight:600; margin:0 0 3px; }
+.course-by{ font-size:12.5px; color:var(--ink-dim); }
+.course-langs{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.course-langs .avail{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-dim); font-weight:700; margin-inline-end:2px; }
+.lchip{
+  display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; font-size:11.5px; font-weight:700;
+  border:1px solid var(--accent); color:var(--ink);
+}
+.lchip.part{ border-style:dashed; color:var(--ink-dim); border-color:var(--line); }
+.lchip.eff{ background:var(--gold-soft); border-color:var(--gold); }
+.lchip .flag{ font-size:13px; line-height:1; }
+.lang-warn{
+  margin-top:10px; padding:7px 10px; border-radius:8px; background:var(--gold-soft); font-size:12.5px; color:var(--ink);
+}
+.course-blurb{ margin:10px 0 14px; font-size:14px; line-height:1.6; color:var(--ink-dim); max-width:80ch; }
+
+.cov-wrap{ overflow-x:auto; }
+.cov-grid{ border-collapse:separate; border-spacing:4px; direction:ltr; min-width:300px; }
+.cov-grid th{ font-size:11.5px; font-weight:700; color:var(--ink-dim); text-align:center; padding:2px 4px; }
+.cov-grid th.cov-row{ text-align:start; font-family:'Fraunces',serif; font-size:13px; white-space:nowrap; padding-inline-end:8px; }
+.cov-cell{
+  position:relative; overflow:hidden; display:block; width:100%; min-width:54px; height:38px;
+  border:1px solid var(--line); border-radius:8px; background:var(--surface-2);
+  color:var(--ink); font-family:'Karla',sans-serif; font-size:13px; cursor:pointer; padding:0;
+}
+.cov-cell::before{
+  content:""; position:absolute; inset:0; background:var(--cell-color);
+  opacity:calc(var(--f) * .5);
+}
+.cov-cell b, .cov-cell span{ position:relative; }
+.cov-cell span{ color:var(--ink-dim); font-size:11px; }
+.cov-cell:not(.empty){ border-color:var(--cell-color); }
+.cov-cell.empty{ opacity:.55; cursor:default; }
+.cov-cell.sel{ outline:2px solid var(--ink); outline-offset:1px; }
+.cov-cell.hl{ box-shadow:0 0 0 2px var(--gold); }
+.cov-summary{ margin-top:8px; font-size:13px; color:var(--ink-dim); }
+.cov-summary b{ color:var(--ink); }
+
+.cell-detail{ margin-top:10px; padding:10px 12px; border-radius:10px; background:var(--surface-2); font-size:13px; }
+.cell-detail-title{ font-family:'Fraunces',serif; font-weight:600; margin-bottom:6px; }
+.cell-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px; }
+.cell-list li{ display:flex; align-items:baseline; gap:8px; }
+.cell-list .tick{ width:14px; color:var(--accent); font-weight:700; flex:none; }
+.cell-list li.done .ct{ color:var(--ink-dim); text-decoration:line-through; text-decoration-color:var(--line); }
+.cov-sess{ color:var(--ink-dim); font-size:12px; }
+.cell-miss{ margin-top:8px; color:var(--ink-dim); font-size:12.5px; line-height:1.5; }
+.cell-miss b{ color:var(--ink); font-weight:600; }
+
+.sess-toggle{
+  margin-top:12px; display:inline-flex; align-items:center; gap:6px; padding:7px 12px; border-radius:9px;
+  border:1px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer;
+  font-family:'Karla',sans-serif; font-weight:700; font-size:13px;
+}
+.sess-toggle:hover{ background:var(--surface-2); }
+.sess-toggle .caret{ margin-top:0; transition:transform .15s ease; }
+.sess-toggle[aria-expanded="true"] .caret{ transform:rotate(90deg); }
+.sess-wrap{ margin-top:10px; }
+.sess-group{ font-family:'Fraunces',serif; font-weight:600; font-size:13.5px; margin:14px 0 4px; color:var(--ink); }
+.sess-list{ list-style:none; margin:0; padding:0; }
+.sess{ display:flex; gap:10px; padding:6px 4px; border-top:1px solid var(--line); font-size:13.5px; line-height:1.4; }
+.sess:first-child{ border-top:none; }
+.sess.hit{ background:var(--gold-soft); border-radius:6px; }
+.sn{ flex:0 0 58px; color:var(--ink-dim); font-size:12px; font-variant-numeric:tabular-nums; padding-top:1px; }
+.sbody{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.sbody a{ color:var(--accent); font-weight:600; text-decoration:underline; text-decoration-color:var(--line); text-underline-offset:2px; }
+.sbody a:hover{ text-decoration-color:var(--accent); }
+.nofile{ color:var(--ink-dim); }
+.pg{ color:var(--ink-dim); font-size:12px; }
+.sitems{ font-size:12px; color:var(--ink-dim); }
+.lang-badge{
+  display:inline-block; font-size:10.5px; font-weight:700; padding:1px 6px; border-radius:6px;
+  background:var(--surface-2); color:var(--ink-dim); border:1px solid var(--line); vertical-align:1px;
+}
+.lang-badge.off{ border-style:dashed; }
+.cc-btn{
+  display:inline-block; margin-top:6px; padding:0; border:none; background:none; cursor:pointer;
+  color:var(--accent); font-family:'Karla',sans-serif; font-weight:700; font-size:12.5px; text-decoration:underline;
+  text-decoration-color:var(--line); text-underline-offset:2px;
+}
+.cc-btn:hover{ text-decoration-color:var(--accent); }
+.next-card .cc-btn{ display:block; color:inherit; }
+:root[dir="rtl"] .course-blurb,
+:root[dir="rtl"] .course-by,
+:root[dir="rtl"] .cov-summary,
+:root[dir="rtl"] .cell-detail,
+:root[dir="rtl"] .lang-warn,
+:root[dir="rtl"] .item-banner,
+:root[dir="rtl"] .flabel,
+:root[dir="rtl"] .sess-toggle,
+:root[dir="rtl"] .view-tabs button{ direction:rtl; text-align:right; }
+:root[dir="rtl"] .view-tabs{ direction:ltr; }
+@media (max-width:760px){ .flabel{ min-width:100%; } .sn{ flex-basis:46px; } }
+@media print{ .view-tabs{ display:none !important; } }
+
+/* Show-me-around tour */
+.lang-row{ align-items:center; }
+.tour-btn{
+  display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px;
+  border:1px solid var(--accent); background:var(--surface); color:var(--accent);
+  font-family:'Karla',sans-serif; font-weight:700; font-size:12.5px; cursor:pointer; box-shadow:var(--shadow);
+  margin-inline-start:6px;
+}
+.tour-btn:hover{ background:var(--accent); color:var(--accent-ink); }
+.tour-hint{
+  display:inline-flex; align-items:center; gap:2px; padding:3px 4px 3px 12px; border-radius:999px;
+  background:var(--gold-soft); border:1px solid var(--gold); font-size:12.5px; font-weight:700; color:var(--ink);
+}
+.tour-hint span{ cursor:pointer; }
+.tour-hint button{
+  border:none; background:transparent; color:var(--ink-dim); font-size:16px; line-height:1; cursor:pointer;
+  padding:2px 7px; border-radius:50%;
+}
+.tour-hint button:hover{ background:var(--surface-2); color:var(--ink); }
+
+.tour-shield{ position:fixed; inset:0; z-index:1000; background:transparent; }
+.tour-spot{
+  position:absolute; z-index:1001; pointer-events:none; border-radius:12px;
+  box-shadow:0 0 0 9999px rgba(12,16,10,.62), 0 0 0 3px var(--gold);
+  transition:left .2s ease, top .2s ease, width .2s ease, height .2s ease;
+}
+.tour-pop{
+  position:absolute; z-index:1002; width:min(360px, calc(100vw - 24px));
+  background:var(--surface); color:var(--ink); border:1px solid var(--gold); border-radius:14px;
+  box-shadow:0 10px 40px rgba(0,0,0,.35); padding:14px 16px 14px;
+}
+.tour-pop.center{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:min(420px, calc(100vw - 24px)); }
+.tour-pop.dock{ position:fixed; left:50%; bottom:12px; top:auto; transform:translateX(-50%); width:min(560px, calc(100vw - 24px)); max-height:55vh; overflow:auto; }
+.tour-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+.tour-count{ font-size:11px; text-transform:uppercase; letter-spacing:.08em; font-weight:700; color:var(--ink-dim); }
+.tour-x{ border:none; background:transparent; color:var(--ink-dim); font-size:20px; line-height:1; cursor:pointer; padding:0 4px; }
+.tour-x:hover{ color:var(--ink); }
+.tour-title{ font-family:'Fraunces',Georgia,serif; font-weight:600; font-size:18px; margin:2px 0 6px; }
+.tour-text{ font-size:14px; line-height:1.55; color:var(--ink-dim); }
+.tour-text ol{ margin:0; padding-inline-start:20px; }
+.tour-text li{ margin:0 0 4px; }
+.tour-nav{ display:flex; align-items:center; gap:8px; margin-top:12px; }
+.tour-sp{ flex:1; }
+.tour-link{ border:none; background:transparent; color:var(--ink-dim); font-family:'Karla',sans-serif; font-size:12.5px; font-weight:700; cursor:pointer; text-decoration:underline; padding:4px 0; }
+.tour-sec, .tour-pri{
+  padding:7px 14px; border-radius:9px; font-family:'Karla',sans-serif; font-weight:700; font-size:13px; cursor:pointer;
+}
+.tour-sec{ border:1px solid var(--line); background:var(--surface); color:var(--ink); }
+.tour-sec:disabled{ opacity:.45; cursor:default; }
+.tour-pri{ border:none; background:var(--accent); color:var(--accent-ink); }
+.tour-pri:hover{ filter:brightness(1.08); }
+:root[dir="rtl"] .tour-pop{ direction:rtl; text-align:right; }
+@media print{ .tour-btn, .tour-hint, .tour-shield, .tour-spot, .tour-pop{ display:none !important; } }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<div class="wrap">
+  <nav class="lang-row" id="langRow">
+    <button type="button" class="lang-btn" data-lang="en">&#127468;&#127463; EN</button>
+    <button type="button" class="lang-btn" data-lang="uk">&#127482;&#127462; UA</button>
+    <button type="button" class="lang-btn" data-lang="de">&#127465;&#127466; DE</button>
+    <button type="button" class="lang-btn" data-lang="es">&#127466;&#127480; ES</button>
+    <button type="button" class="lang-btn" data-lang="it">&#127470;&#127481; IT</button>
+    <button type="button" class="lang-btn" data-lang="pl">&#127477;&#127473; PL</button>
+    <button type="button" class="lang-btn" data-lang="fa">&#127470;&#127479; FA</button>
+    <button type="button" class="tour-btn" id="tourBtn"></button>
+    <span class="tour-hint" id="tourHint" hidden><span id="tourHintText"></span><button type="button" id="tourHintX">&times;</button></span>
+  </nav>
+
+  <header class="top">
+    <div class="header-row">
+      <div class="intro">
+        <div class="eyebrow" id="eyebrowText"></div>
+        <h1>iDisciple</h1>
+        <p class="lede" id="ledeText"></p>
+      </div>
+      <div class="record-card" id="recordCard">
+        <div class="record-title" id="recordTitleText"></div>
+        <label for="rfDisciple" id="lblDisciple"></label>
+        <input type="text" id="rfDisciple">
+        <label for="rfDiscipler" id="lblDiscipler"></label>
+        <input type="text" id="rfDiscipler">
+        <label for="rfDate" id="lblDate"></label>
+        <input type="date" id="rfDate">
+        <label for="rfNextSteps" id="lblNextSteps"></label>
+        <textarea id="rfNextSteps"></textarea>
+        <label for="rfDueDate" id="lblDueDate"></label>
+        <input type="date" id="rfDueDate">
+        <button type="button" class="print-btn" id="printBtn"></button>
+        <div class="print-status" id="printStatus" aria-live="polite"></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="view-tabs" id="viewTabs" role="tablist">
+    <button type="button" role="tab" data-view="pathway" id="tabPathway"></button>
+    <button type="button" role="tab" data-view="courses" id="tabCourses"></button>
+  </nav>
+
+  <div id="viewPathway">
+  <section class="overview-wrap">
+    <div class="section-title" id="overviewTitleText"></div>
+    <p class="overview-hint" id="overviewHintText"></p>
+    <div class="table-scroll">
+      <table class="overview-table" id="overviewTable"></table>
+    </div>
+  </section>
+
+  <nav class="path" id="stageNav"></nav>
+
+  <section class="next-steps">
+    <div class="section-title"><span id="nextStepsLabel"></span> <span id="stageLabelInline"></span></div>
+    <div class="next-grid" id="nextGrid"></div>
+  </section>
+
+  <section class="columns" id="columns"></section>
+  </div>
+
+  <div id="coursesView" hidden></div>
+
+  <footer class="note" id="footerNote"></footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var STAGES = [
+  {id:"nb", name:"New Born"},
+  {id:"disciple", name:"Disciple"},
+  {id:"worker", name:"Worker"},
+  {id:"leader", name:"Leader"}
+];
+var DIVISIONS = [
+  {id:"learn", label:"Knowing", sub:"Doctrine", color:"var(--learn)"},
+  {id:"practice", label:"Doing", sub:"Conduct", color:"var(--practice)"},
+  {id:"character", label:"Being", sub:"1 Tim 3 / Titus 1", color:"var(--character)"}
+];
+
+// ---------------------------------------------------------------------------
+// Translations. Resource-line text (file/series names, "(verify)" notes) stays
+// in English on purpose — those are search keywords against real filenames in
+// your Drive folder, so translating them would break the links. Everything
+// else — chrome, stage/division names, and the 56 growth-area titles — is
+// translated. "en" is the source of truth; missing keys fall back to it.
+// ---------------------------------------------------------------------------
+var LANGS = ["en","uk","de","es","it","pl","fa"];
+var LANG_FLAGS = {en:"&#127468;&#127463;", uk:"&#127482;&#127462;", de:"&#127465;&#127466;", es:"&#127466;&#127480;", it:"&#127470;&#127481;", pl:"&#127477;&#127473;", fa:"&#127470;&#127479;"};
+var LANG_NAMES = {en:"EN", uk:"UA", de:"DE", es:"ES", it:"IT", pl:"PL", fa:"FA"};
+var RTL_LANGS = ["fa"];
+
+var STAGE_TR = {
+  nb:       {en:"New Born",  uk:"Новонароджений", de:"Neugeboren",     es:"Recién Nacido", it:"Neonato",       pl:"Nowo narodzony", fa:"نوزاد"},
+  disciple: {en:"Disciple",  uk:"Учень",          de:"Jünger",         es:"Discípulo",     it:"Discepolo",     pl:"Uczeń",          fa:"شاگرد"},
+  worker:   {en:"Worker",    uk:"Працівник",      de:"Mitarbeiter",    es:"Obrero",        it:"Collaboratore", pl:"Pracownik",      fa:"خادم"},
+  leader:   {en:"Leader",    uk:"Лідер",          de:"Leiter",         es:"Líder",         it:"Leader",        pl:"Lider",          fa:"رهبر"}
+};
+
+var DIV_TR = {
+  learn:     {label:{en:"Knowing", uk:"Знання", de:"Wissen",  es:"Saber",  it:"Sapere",  pl:"Wiedza",   fa:"شناخت"},
+              sub:  {en:"Doctrine", uk:"Вчення", de:"Lehre",   es:"Doctrina", it:"Dottrina", pl:"Doktryna", fa:"تعلیم"}},
+  practice:  {label:{en:"Doing",   uk:"Дії",    de:"Handeln", es:"Hacer",  it:"Fare",    pl:"Działanie", fa:"عمل"},
+              sub:  {en:"Conduct", uk:"Поведінка", de:"Wandel",  es:"Conducta", it:"Condotta", pl:"Postępowanie", fa:"رفتار"}},
+  character: {label:{en:"Being",   uk:"Буття",  de:"Sein",    es:"Ser",    it:"Essere",  pl:"Bycie",    fa:"بودن"},
+              sub:  {en:"1 Tim 3 / Titus 1", uk:"1 Тим 3 / Тит 1", de:"1. Tim 3 / Titus 1", es:"1 Tim 3 / Tito 1", it:"1 Tim 3 / Tito 1", pl:"1 Tm 3 / Tt 1", fa:"اول تیموتائوس ۳ / تیتوس ۱"}}
+};
+
+var TITLE_TR = {
+  // Being / Character
+  "Reliable": {uk:"Надійний", de:"Zuverlässig", es:"Fiable", it:"Affidabile", pl:"Rzetelny", fa:"قابل‌اعتماد"},
+  "Faithful in physical areas": {uk:"Вірний у практичних сферах", de:"Treu in praktischen Bereichen", es:"Fiel en las áreas físicas", it:"Fedele negli ambiti pratici", pl:"Wierny w sprawach praktycznych", fa:"امین در امور عملی"},
+  "Availability": {uk:"Доступність", de:"Verfügbarkeit", es:"Disponibilidad", it:"Disponibilità", pl:"Dyspozycyjność", fa:"در دسترس بودن"},
+  "Teachability": {uk:"Готовність вчитися", de:"Belehrbarkeit", es:"Disposición a aprender", it:"Disponibilità a farsi correggere", pl:"Otwartość na pouczanie", fa:"تعلیم‌پذیری"},
+  "Obedience": {uk:"Слухняність", de:"Gehorsam", es:"Obediencia", it:"Obbedienza", pl:"Posłuszeństwo", fa:"اطاعت"},
+  "Humility": {uk:"Смирення", de:"Demut", es:"Humildad", it:"Umiltà", pl:"Pokora", fa:"فروتنی"},
+  "Heart for God": {uk:"Серце для Бога", de:"Herz für Gott", es:"Corazón para Dios", it:"Cuore per Dio", pl:"Serce dla Boga", fa:"دلی برای خدا"},
+  "Faith": {uk:"Віра", de:"Glaube", es:"Fe", it:"Fede", pl:"Wiara", fa:"ایمان"},
+  "Faithful in spiritual areas": {uk:"Вірний у духовних сферах", de:"Treu in geistlichen Bereichen", es:"Fiel en las áreas espirituales", it:"Fedele negli ambiti spirituali", pl:"Wierny w sprawach duchowych", fa:"امین در امور روحانی"},
+  "Vision to be used by God": {uk:"Бачення бути використаним Богом", de:"Vision, von Gott gebraucht zu werden", es:"Visión de ser usado por Dios", it:"Visione di essere usato da Dio", pl:"Pragnienie bycia użytecznym dla Boga", fa:"اشتیاق برای استفاده شدن توسط خدا"},
+  "Servant's heart": {uk:"Серце слуги", de:"Dienerherz", es:"Corazón de siervo", it:"Cuore di servo", pl:"Serce sługi", fa:"دل خادم"},
+  "Submission": {uk:"Покора", de:"Unterordnung", es:"Sumisión", it:"Sottomissione", pl:"Poddanie się", fa:"تسلیم بودن"},
+  "Hospitable": {uk:"Гостинний", de:"Gastfreundlich", es:"Hospitalario", it:"Ospitale", pl:"Gościnność", fa:"مهمان‌نواز"},
+  "Above reproach": {uk:"Бездоганний", de:"Unbescholten", es:"Irreprensible", it:"Irreprensibile", pl:"Nienaganny", fa:"بی‌عیب"},
+  "A pacesetter": {uk:"Той, хто задає темп", de:"Ein Schrittmacher", es:"Un ejemplo que marca el ritmo", it:"Un esempio trainante", pl:"Wzór do naśladowania", fa:"پیشگام بودن"},
+  "A shepherd's heart": {uk:"Серце пастиря", de:"Ein Hirtenherz", es:"Un corazón de pastor", it:"Un cuore da pastore", pl:"Serce pasterza", fa:"دل شبان"},
+  "Wisdom / discernment": {uk:"Мудрість / розсудливість", de:"Weisheit / Unterscheidungsvermögen", es:"Sabiduría / Discernimiento", it:"Saggezza / Discernimento", pl:"Mądrość / rozeznanie", fa:"حکمت / تشخیص"},
+  "Faith and prayer": {uk:"Віра і молитва", de:"Glaube und Gebet", es:"Fe y oración", it:"Fede e preghiera", pl:"Wiara i modlitwa", fa:"ایمان و دعا"},
+  // Knowing / Doctrine
+  "Assurance of salvation": {uk:"Впевненість у спасінні", de:"Heilsgewissheit", es:"Seguridad de la salvación", it:"Certezza della salvezza", pl:"Pewność zbawienia", fa:"اطمینان از نجات"},
+  "Deity of Christ": {uk:"Божественність Христа", de:"Gottheit Christi", es:"Deidad de Cristo", it:"Divinità di Cristo", pl:"Bóstwo Chrystusa", fa:"الوهیت مسیح"},
+  "Eternal security": {uk:"Вічна безпека", de:"Ewige Bewahrung", es:"Seguridad eterna", it:"Sicurezza eterna", pl:"Wieczne bezpieczeństwo", fa:"امنیت ابدی"},
+  "Holiness": {uk:"Святість", de:"Heiligung", es:"Santidad", it:"Santità", pl:"Świętość", fa:"قدوسیت"},
+  "Holy Spirit": {uk:"Святий Дух", de:"Heiliger Geist", es:"Espíritu Santo", it:"Spirito Santo", pl:"Duch Święty", fa:"روح‌القدس"},
+  "Authority of Word of God": {uk:"Авторитет Слова Божого", de:"Autorität des Wortes Gottes", es:"Autoridad de la Palabra de Dios", it:"Autorità della Parola di Dio", pl:"Autorytet Słowa Bożego", fa:"اقتدار کلام خدا"},
+  "The church": {uk:"Церква", de:"Die Gemeinde", es:"La iglesia", it:"La chiesa", pl:"Kościół", fa:"کلیسا"},
+  "The Great Commission": {uk:"Велике доручення", de:"Der Missionsbefehl", es:"La Gran Comisión", it:"Il grande mandato", pl:"Wielkie Posłannictwo", fa:"مأموریت بزرگ"},
+  "Attributes of God": {uk:"Властивості Бога", de:"Eigenschaften Gottes", es:"Atributos de Dios", it:"Attributi di Dio", pl:"Przymioty Boga", fa:"صفات خدا"},
+  "Second coming": {uk:"Друге пришестя", de:"Wiederkunft Christi", es:"Segunda venida", it:"Seconda venuta", pl:"Powtórne przyjście Chrystusa", fa:"بازگشت دوم مسیح"},
+  "Apologetics": {uk:"Апологетика", de:"Apologetik", es:"Apologética", it:"Apologetica", pl:"Apologetyka", fa:"دفاعیات ایمان"},
+  "False doctrine": {uk:"Хибне вчення", de:"Falsche Lehre", es:"Falsa doctrina", it:"Falsa dottrina", pl:"Fałszywa nauka", fa:"تعلیم نادرست"},
+  "Sound doctrine": {uk:"Здорове вчення", de:"Gesunde Lehre", es:"Sana doctrina", it:"Sana dottrina", pl:"Zdrowa nauka", fa:"تعلیم صحیح"},
+  "Deep convictions": {uk:"Глибокі переконання", de:"Tiefe Überzeugungen", es:"Convicciones profundas", it:"Convinzioni profonde", pl:"Głębokie przekonania", fa:"باورهای عمیق"},
+  "Able to refute wrong doctrine": {uk:"Здатний спростувати хибне вчення", de:"Fähig, falsche Lehre zu widerlegen", es:"Capaz de refutar la falsa doctrina", it:"Capace di confutare la falsa dottrina", pl:"Zdolny do obalania błędnej nauki", fa:"قادر به رد تعلیم نادرست"},
+  // Doing / Conduct
+  "Quiet Time": {uk:"Тихий час", de:"Stille Zeit", es:"Tiempo devocional", it:"Tempo di quiete", pl:"Czas osobisty z Bogiem", fa:"وقت خلوت"},
+  "Fellowship": {uk:"Спілкування", de:"Gemeinschaft", es:"Comunión", it:"Comunione fraterna", pl:"Społeczność", fa:"مشارکت"},
+  "Baptism": {uk:"Хрещення", de:"Taufe", es:"Bautismo", it:"Battesimo", pl:"Chrzest", fa:"تعمید"},
+  "Studying God's Word": {uk:"Вивчення Слова Божого", de:"Bibelstudium", es:"Estudio de la Palabra de Dios", it:"Studio della Parola di Dio", pl:"Studiowanie Słowa Bożego", fa:"مطالعه کلام خدا"},
+  "Prayer": {uk:"Молитва", de:"Gebet", es:"Oración", it:"Preghiera", pl:"Modlitwa", fa:"دعا"},
+  "Witnessing": {uk:"Свідчення (євангелізація)", de:"Zeugnis geben", es:"Testificar", it:"Testimonianza", pl:"Świadczenie (ewangelizacja)", fa:"شهادت دادن"},
+  "Serving": {uk:"Служіння", de:"Dienen", es:"Servir", it:"Servire", pl:"Służenie", fa:"خدمت کردن"},
+  "Giving (tithing)": {uk:"Пожертвування (десятина)", de:"Geben (Zehnten)", es:"Dar (diezmar)", it:"Dare (decima)", pl:"Dawanie (dziesięcina)", fa:"بخشش (ده‌یک)"},
+  "Victory over sin": {uk:"Перемога над гріхом", de:"Sieg über die Sünde", es:"Victoria sobre el pecado", it:"Vittoria sul peccato", pl:"Zwycięstwo nad grzechem", fa:"پیروزی بر گناه"},
+  "Discover spiritual gift": {uk:"Виявити духовний дар", de:"Geistliche Gabe entdecken", es:"Descubrir el don espiritual", it:"Scoprire il proprio dono spirituale", pl:"Odkrycie daru duchowego", fa:"کشف عطای روحانی"},
+  "Extended time with God": {uk:"Тривалий час з Богом", de:"Ausgedehnte Zeit mit Gott", es:"Tiempo prolongado con Dios", it:"Tempo prolungato con Dio", pl:"Dłuższy czas z Bogiem", fa:"وقت طولانی‌تر با خدا"},
+  "Discipling": {uk:"Учнівство (наставництво)", de:"Andere jüngern", es:"Discipular", it:"Fare discepoli", pl:"Czynienie uczniów", fa:"شاگردسازی"},
+  "Co-laboring / unity": {uk:"Співпраця / єдність", de:"Zusammenarbeit / Einheit", es:"Colaboración / Unidad", it:"Collaborazione / Unità", pl:"Współpraca / jedność", fa:"همکاری / اتحاد"},
+  "Sacrificial lifestyle": {uk:"Жертовний спосіб життя", de:"Aufopferungsvoller Lebensstil", es:"Estilo de vida sacrificado", it:"Stile di vita sacrificale", pl:"Ofiarny styl życia", fa:"سبک زندگی فداکارانه"},
+  "Giving and receiving reproof": {uk:"Давати і приймати докір", de:"Zurechtweisung geben und annehmen", es:"Dar y recibir corrección", it:"Dare e ricevere correzione", pl:"Udzielanie i przyjmowanie upomnienia", fa:"دادن و پذیرفتن تذکر"},
+  "Develop spiritual gift": {uk:"Розвивати духовний дар", de:"Geistliche Gabe entwickeln", es:"Desarrollar el don espiritual", it:"Sviluppare il proprio dono spirituale", pl:"Rozwijanie daru duchowego", fa:"رشد دادن عطای روحانی"},
+  "Teaching": {uk:"Навчання", de:"Lehren", es:"Enseñar", it:"Insegnare", pl:"Nauczanie", fa:"تعلیم دادن"},
+  "Preaching": {uk:"Проповідування", de:"Predigen", es:"Predicar", it:"Predicare", pl:"Głoszenie (kazanie)", fa:"موعظه کردن"},
+  "Exhorting (motivating)": {uk:"Заохочення (мотивація)", de:"Ermahnen (motivieren)", es:"Exhortar (motivar)", it:"Esortare (motivare)", pl:"Napominanie (motywowanie)", fa:"نصیحت کردن (ترغیب)"},
+  "Counseling": {uk:"Душпастирська опіка", de:"Seelsorge", es:"Consejería", it:"Consulenza pastorale", pl:"Doradztwo duszpasterskie", fa:"مشاوره شبانی"},
+  "Managing one's household": {uk:"Керування власним домом", de:"Den eigenen Haushalt leiten", es:"Administrar bien su casa", it:"Gestire bene la propria famiglia", pl:"Dobre zarządzanie własnym domem", fa:"اداره نیکوی خانه خود"},
+  "Administration": {uk:"Адміністрування", de:"Verwaltung", es:"Administración", it:"Amministrazione", pl:"Administracja", fa:"مدیریت اجرایی"},
+  "Overseeing": {uk:"Нагляд", de:"Aufsicht führen", es:"Supervisar", it:"Sovrintendere", pl:"Nadzorowanie", fa:"نظارت کردن"}
+};
+
+var UI_STRINGS = {
+  eyebrow: {en:"New Born → Disciple → Worker → Leader"}, // built from STAGE_TR at render time instead
+  lede: {
+    en:'A map of spiritual growth from new life in Christ to leadership, in three areas — <b>Knowing</b> (doctrine), <b>Doing</b> (conduct), and <b>Being</b> (character) — drawn from the qualifications of an elder in 1&nbsp;Timothy&nbsp;3 and Titus&nbsp;1. Though written for overseers, these areas of growth apply to every believer, women included. Check off what’s already true of you or the person you’re discipling, and your next steps — with resources for each — will surface automatically.',
+    uk:'Карта духовного зростання від нового життя в Христі до лідерства, у трьох сферах — <b>Знання</b> (вчення), <b>Дії</b> (поведінка) та <b>Буття</b> (характер) — складена на основі вимог до старійшини в 1&nbsp;Тимофія&nbsp;3 та Титу&nbsp;1. Хоча ці вимоги написані для єпископів (наглядачів), ці сфери зростання стосуються кожного віруючого, включно з жінками. Познач те, що вже є правдою про тебе або про людину, яку ти наставляєш, — і твої наступні кроки з відповідними ресурсами з’являться автоматично.',
+    de:'Eine Landkarte geistlichen Wachstums von der Neugeburt in Christus bis zur Leiterschaft, in drei Bereichen — <b>Wissen</b> (Lehre), <b>Handeln</b> (Wandel) und <b>Sein</b> (Charakter) — abgeleitet aus den Anforderungen an einen Ältesten in 1.&nbsp;Timotheus&nbsp;3 und Titus&nbsp;1. Obwohl für Aufseher geschrieben, gelten diese Wachstumsbereiche für jeden Gläubigen, auch für Frauen. Hake ab, was bei dir oder der Person, die du jüngerst, bereits zutrifft — deine nächsten Schritte samt passenden Ressourcen erscheinen dann automatisch.',
+    es:'Un mapa del crecimiento espiritual desde el nuevo nacimiento en Cristo hasta el liderazgo, en tres áreas — <b>Saber</b> (doctrina), <b>Hacer</b> (conducta) y <b>Ser</b> (carácter) — tomadas de los requisitos de un anciano en 1&nbsp;Timoteo&nbsp;3 y Tito&nbsp;1. Aunque se escribieron para los ancianos/obispos, estas áreas de crecimiento aplican a todo creyente, incluidas las mujeres. Marca lo que ya es cierto de ti o de la persona que estás discipulando, y tus próximos pasos — con recursos para cada uno — aparecerán automáticamente.',
+    it:'Una mappa della crescita spirituale dalla nuova nascita in Cristo fino alla leadership, in tre aree — <b>Sapere</b> (dottrina), <b>Fare</b> (condotta) ed <b>Essere</b> (carattere) — tratte dai requisiti per un anziano in 1&nbsp;Timoteo&nbsp;3 e Tito&nbsp;1. Sebbene scritte per i sovrintendenti, queste aree di crescita si applicano a ogni credente, comprese le donne. Spunta ciò che è già vero di te o della persona che stai discepolando: i tuoi prossimi passi, con le relative risorse, appariranno automaticamente.',
+    pl:'Mapa duchowego wzrostu od nowego życia w Chrystusie aż do przywództwa, w trzech obszarach — <b>Wiedza</b> (doktryna), <b>Działanie</b> (postępowanie) i <b>Bycie</b> (charakter) — oparta na wymaganiach stawianych starszemu w 1&nbsp;Tymoteusza&nbsp;3 i Tytusa&nbsp;1. Choć napisane dla biskupów (nadzorców), te obszary wzrostu dotyczą każdego wierzącego, w tym kobiet. Zaznacz, co jest już prawdą o tobie lub o osobie, którą dyscyplinujesz, a twoje kolejne kroki — wraz z materiałami do każdego z nich — pojawią się automatycznie.',
+    fa:'نقشه‌ای از رشد روحانی، از تولد تازه در مسیح تا رهبری، در سه حوزه — <b>شناخت</b> (تعلیم)، <b>عمل</b> (رفتار) و <b>بودن</b> (شخصیت) — برگرفته از شرایط لازم برای یک شیخ (ناظر) در رساله اول تیموتائوس&nbsp;۳ و تیتوس&nbsp;۱. اگرچه این شرایط برای ناظران نوشته شده، این حوزه‌های رشد برای هر ایماندار، از جمله زنان، کاربرد دارد. آنچه را که از قبل درباره‌ی خودت یا شخصی که شاگردسازی می‌کنی صادق است علامت بزن، و قدم‌های بعدی تو — همراه با منابع برای هر کدام — به‌طور خودکار نمایان خواهد شد.'
+  },
+  recordTitle: {en:"Session Record", uk:"Протокол зустрічі", de:"Sitzungsprotokoll", es:"Registro de la Sesión", it:"Scheda dell’Incontro", pl:"Protokół spotkania", fa:"گزارش جلسه"},
+  labelDisciple: {en:"Disciple", uk:"Учень", de:"Jünger", es:"Discípulo", it:"Discepolo", pl:"Uczeń", fa:"شاگرد"},
+  labelDiscipler: {en:"Discipler", uk:"Наставник", de:"Mentor", es:"Discipulador", it:"Mentore", pl:"Mentor", fa:"شاگردساز"},
+  labelDate: {en:"Date", uk:"Дата", de:"Datum", es:"Fecha", it:"Data", pl:"Data", fa:"تاریخ"},
+  labelNextSteps: {en:"Next Steps", uk:"Наступні кроки", de:"Nächste Schritte", es:"Próximos pasos", it:"Prossimi passi", pl:"Kolejne kroki", fa:"قدم‌های بعدی"},
+  labelDueDate: {en:"To be done by", uk:"Виконати до", de:"Zu erledigen bis", es:"A realizar antes del", it:"Da completare entro", pl:"Termin wykonania", fa:"مهلت انجام"},
+  placeholderName: {en:"Name", uk:"Ім’я", de:"Name", es:"Nombre", it:"Nome", pl:"Imię", fa:"نام"},
+  placeholderNextSteps: {
+    en:"Agreed next steps from this meeting", uk:"Узгоджені наступні кроки з цієї зустрічі", de:"Vereinbarte nächste Schritte aus diesem Gespräch",
+    es:"Próximos pasos acordados en esta reunión", it:"Prossimi passi concordati in questo incontro",
+    pl:"Uzgodnione kolejne kroki z tego spotkania", fa:"قدم‌های بعدی توافق‌شده در این جلسه"
+  },
+  btnDownload: {en:"Download PDF", uk:"Завантажити PDF", de:"PDF herunterladen", es:"Descargar PDF", it:"Scarica PDF", pl:"Pobierz PDF", fa:"دانلود PDF"},
+  btnPreparing: {en:"Preparing PDF…", uk:"Підготовка PDF…", de:"PDF wird vorbereitet…", es:"Preparando PDF…", it:"Preparazione PDF…", pl:"Przygotowywanie PDF…", fa:"در حال آماده‌سازی PDF…"},
+  statusRendering: {en:"Rendering the page…", uk:"Рендеринг сторінки…", de:"Seite wird gerendert…", es:"Renderizando la página…", it:"Rendering della pagina…", pl:"Renderowanie strony…", fa:"در حال بارگذاری صفحه…"},
+  statusWaiting: {en:"Waiting for your confirmation…", uk:"Очікування підтвердження…", de:"Warte auf deine Bestätigung…", es:"Esperando tu confirmación…", it:"In attesa della tua conferma…", pl:"Oczekiwanie na potwierdzenie…", fa:"در انتظار تأیید شما…"},
+  statusSaved: {en:"Saved.", uk:"Збережено.", de:"Gespeichert.", es:"Guardado.", it:"Salvato.", pl:"Zapisano.", fa:"ذخیره شد."},
+  statusToolsFailed: {
+    en:"PDF tools didn’t load — check your connection and try again.",
+    uk:"Не вдалося завантажити інструменти PDF — перевір з’єднання і спробуй ще раз.",
+    de:"PDF-Werkzeuge konnten nicht geladen werden — Verbindung prüfen und erneut versuchen.",
+    es:"No se pudieron cargar las herramientas de PDF — revisa tu conexión e inténtalo de nuevo.",
+    it:"Impossibile caricare gli strumenti PDF — controlla la connessione e riprova.",
+    pl:"Narzędzia PDF nie zostały załadowane — sprawdź połączenie i spróbuj ponownie.",
+    fa:"ابزارهای PDF بارگذاری نشدند — اتصال خود را بررسی کرده و دوباره تلاش کنید."
+  },
+  statusUnavailable: {
+    en:"PDF downloads aren’t available in this view.", uk:"Завантаження PDF недоступне в цьому перегляді.", de:"PDF-Downloads sind in dieser Ansicht nicht verfügbar.",
+    es:"Las descargas de PDF no están disponibles en esta vista.", it:"Il download del PDF non è disponibile in questa vista.",
+    pl:"Pobieranie PDF nie jest dostępne w tym widoku.", fa:"دانلود PDF در این نما در دسترس نیست."
+  },
+  statusRetry: {en:"Couldn’t create the PDF — try again.", uk:"Не вдалося створити PDF — спробуй ще раз.", de:"PDF konnte nicht erstellt werden — bitte erneut versuchen.",
+    es:"No se pudo crear el PDF — inténtalo de nuevo.", it:"Impossibile creare il PDF — riprova.", pl:"Nie udało się utworzyć PDF — spróbuj ponownie.", fa:"ساخت PDF ممکن نشد — دوباره تلاش کنید."},
+  overviewTitle: {en:"Full Chart Overview", uk:"Повний огляд схеми", de:"Gesamtübersicht", es:"Resumen completo del cuadro", it:"Panoramica completa dello schema", pl:"Pełny przegląd schematu", fa:"نمای کلی کامل نمودار"},
+  overviewHint: {
+    en:"The whole pathway at a glance — check items directly here, or click a stage name to jump into it below.",
+    uk:"Увесь шлях одним поглядом — познач пункти прямо тут або натисни на назву етапу, щоб перейти до неї нижче.",
+    de:"Der gesamte Weg auf einen Blick — hake Punkte direkt hier ab oder klicke auf eine Stufe, um unten dorthin zu springen.",
+    es:"Todo el camino de un vistazo — marca los elementos aquí mismo, o haz clic en una etapa para saltar a ella abajo.",
+    it:"L’intero percorso a colpo d’occhio — spunta le voci qui direttamente, oppure clicca su una fase per passare a essa qui sotto.",
+    pl:"Cała ścieżka na pierwszy rzut oka — zaznaczaj punkty bezpośrednio tutaj lub kliknij nazwę etapu, aby przejść do niego poniżej.",
+    fa:"کل مسیر در یک نگاه — موارد را مستقیماً اینجا علامت بزن، یا روی نام مرحله کلیک کن تا در پایین صفحه به آن بروی."
+  },
+  nextStepsLabel: {en:"Your next steps", uk:"Твої наступні кроки", de:"Deine nächsten Schritte", es:"Tus próximos pasos", it:"I tuoi prossimi passi", pl:"Twoje kolejne kroki", fa:"قدم‌های بعدی تو"},
+  markDone: {en:"Mark this one done", uk:"Позначити як виконано", de:"Als erledigt markieren", es:"Marcar como hecho", it:"Segna come fatto", pl:"Oznacz jako wykonane", fa:"این مورد را انجام‌شده علامت بزن"},
+  doneOfTemplate: {en:"{done} / {total} done", uk:"{done} / {total} виконано", de:"{done} / {total} erledigt", es:"{done} / {total} completado(s)", it:"{done} / {total} completati", pl:"{done} / {total} wykonanych", fa:"{done} از {total} انجام شده"},
+  allDoneTemplate: {
+    en:"{division} complete for this stage — nice work.",
+    uk:"{division} завершено для цього етапу — чудова робота.",
+    de:"{division} für diese Stufe abgeschlossen — gut gemacht.",
+    es:"{division} completado para esta etapa — ¡buen trabajo!",
+    it:"{division} completato per questa fase — ottimo lavoro.",
+    pl:"{division} ukończone na tym etapie — świetna robota.",
+    fa:"{division} برای این مرحله کامل شد — کارت عالی بود."
+  },
+  addResource: {en:"add a resource", uk:"додати ресурс", de:"Ressource hinzufügen", es:"añadir un recurso", it:"aggiungi una risorsa", pl:"dodaj materiał", fa:"یک منبع اضافه کن"},
+  footerNote: {
+    en:'<b>How the links work:</b> a Bible reference opens Bible&nbsp;Gateway (ESV); a named resource opens a Google&nbsp;Drive search for it, so it’ll land on the right file(s) in your <code>AI/ClaudeCowork/iDisciple</code> folder as long as you’re signed into the Drive account that folder lives in — it’s a search, not always a single exact file, since a few areas map to a whole outline section rather than one document. Nothing is embedded directly in this page, since some material (Herschel Training Books, etc.) looks third-party. Items marked <span class="tbd">"add a resource"</span> don’t have an obvious match yet — a good next step is deciding what to point people to there. Matches marked <b>(verify)</b> are my best guess from filenames/outline and worth a second look. Being items throughout are grounded in 1&nbsp;Timothy&nbsp;3:1&ndash;13 and Titus&nbsp;1:5&ndash;9. Your progress is saved in this browser only — it isn’t shared or synced anywhere. <i>Resource names stay in English even in other languages, since they point to the real files in your Drive folder.</i>',
+    uk:'<b>Як працюють посилання:</b> біблійне посилання відкриває Bible&nbsp;Gateway (ESV); названий ресурс відкриває пошук у Google&nbsp;Drive, щоб ти потрапив на потрібний файл(и) у своїй папці <code>AI/ClaudeCowork/iDisciple</code> — за умови, що ти увійшов у той обліковий запис Drive, де знаходиться ця папка. Це пошук, а не завжди один точний файл, оскільки деякі сфери відповідають цілому розділу плану, а не одному документу. Нічого не вбудовано безпосередньо на цю сторінку, оскільки деякі матеріали (наприклад, Herschel Training Books) виглядають як матеріали третіх сторін. Пункти, позначені як <span class="tbd">"додати ресурс"</span>, ще не мають очевидного відповідника — гарний наступний крок це вирішити, на що там варто вказати. Збіги, позначені <b>(verify)</b>, — це моє найкраще припущення на основі назв файлів чи плану і варті повторної перевірки. Пункти розділу «Буття» ґрунтуються на 1&nbsp;Тимофія&nbsp;3:1&ndash;13 та Титу&nbsp;1:5&ndash;9. Твій прогрес зберігається лише в цьому браузері — він нікуди не передається і не синхронізується. <i>Назви ресурсів залишаються англійською навіть в інших мовах, оскільки вони вказують на реальні файли у твоїй папці Drive.</i>',
+    de:'<b>So funktionieren die Links:</b> Eine Bibelstelle öffnet Bible&nbsp;Gateway (ESV); eine benannte Ressource öffnet eine Google&nbsp;Drive-Suche dafür, sodass du bei der richtigen Datei bzw. den richtigen Dateien in deinem Ordner <code>AI/ClaudeCowork/iDisciple</code> landest — vorausgesetzt, du bist mit dem passenden Drive-Konto angemeldet. Es ist eine Suche, nicht immer eine einzelne exakte Datei, da manche Bereiche einem ganzen Gliederungsabschnitt statt einem Dokument entsprechen. Es ist nichts direkt eingebettet, da manches Material (z. B. Herschel Training Books) von Dritten stammen dürfte. Mit <span class="tbd">„Ressource hinzufügen"</span> markierte Punkte haben noch keine offensichtliche Entsprechung. Mit <b>(verify)</b> markierte Treffer sind meine beste Vermutung und verdienen einen zweiten Blick. Die „Sein"-Punkte gründen durchweg auf 1.&nbsp;Timotheus&nbsp;3,1&ndash;13 und Titus&nbsp;1,5&ndash;9. Dein Fortschritt wird nur in diesem Browser gespeichert. <i>Ressourcennamen bleiben auch in anderen Sprachen englisch, da sie auf die echten Dateien in deinem Drive-Ordner verweisen.</i>',
+    es:'<b>Cómo funcionan los enlaces:</b> una referencia bíblica abre Bible&nbsp;Gateway (ESV); un recurso nombrado abre una búsqueda de Google&nbsp;Drive, así llegarás al archivo correcto en tu carpeta <code>AI/ClaudeCowork/iDisciple</code>, siempre que hayas iniciado sesión en esa cuenta de Drive. Es una búsqueda, no siempre un archivo exacto, ya que algunas áreas corresponden a toda una sección del esquema. Nada está incrustado directamente aquí, ya que algunos materiales (Herschel Training Books, etc.) parecen de terceros. Los elementos marcados <span class="tbd">"añadir un recurso"</span> aún no tienen una coincidencia obvia. Las coincidencias marcadas <b>(verify)</b> son mi mejor suposición y merecen revisión. Los elementos de "Ser" se basan en 1&nbsp;Timoteo&nbsp;3:1&ndash;13 y Tito&nbsp;1:5&ndash;9. Tu progreso se guarda solo en este navegador. <i>Los nombres de los recursos permanecen en inglés incluso en otros idiomas, ya que apuntan a los archivos reales de tu carpeta de Drive.</i>',
+    it:'<b>Come funzionano i link:</b> un riferimento biblico apre Bible&nbsp;Gateway (ESV); una risorsa con nome apre una ricerca su Google&nbsp;Drive, così arriverai al file giusto nella tua cartella <code>AI/ClaudeCowork/iDisciple</code>, purché tu abbia effettuato l’accesso a quell’account Drive. È una ricerca, non sempre un unico file esatto, poiché alcune aree corrispondono a un’intera sezione dello schema. Niente è incorporato direttamente qui, poiché alcuni materiali (Herschel Training Books, ecc.) sembrano di terzi. Le voci contrassegnate <span class="tbd">"aggiungi una risorsa"</span> non hanno ancora una corrispondenza ovvia. Le corrispondenze contrassegnate <b>(verify)</b> sono la mia migliore ipotesi e meritano un secondo sguardo. Le voci di "Essere" si fondano su 1&nbsp;Timoteo&nbsp;3:1&ndash;13 e Tito&nbsp;1:5&ndash;9. I tuoi progressi sono salvati solo in questo browser. <i>I nomi delle risorse restano in inglese anche nelle altre lingue, poiché indicano i file reali nella tua cartella Drive.</i>',
+    pl:'<b>Jak działają linki:</b> odniesienie biblijne otwiera Bible&nbsp;Gateway (ESV); nazwany materiał otwiera wyszukiwanie w Google&nbsp;Drive, dzięki czemu trafisz na właściwy plik (pliki) w swoim folderze <code>AI/ClaudeCowork/iDisciple</code> — o ile jesteś zalogowany na konto Drive, w którym znajduje się ten folder. To wyszukiwanie, nie zawsze pojedynczy dokładny plik, ponieważ niektóre obszary odpowiadają całej sekcji planu, a nie jednemu dokumentowi. Nic nie jest osadzone bezpośrednio na tej stronie, ponieważ część materiałów (np. Herschel Training Books) wygląda na pochodzące od osób trzecich. Pozycje oznaczone jako <span class="tbd">„dodaj materiał”</span> nie mają jeszcze oczywistego dopasowania — dobrym następnym krokiem jest ustalenie, co tam wskazać. Twój postęp jest zapisywany wyłącznie w tej przeglądarce — nigdzie nie jest udostępniany ani synchronizowany. <i>Nazwy materiałów pozostają w języku angielskim nawet w innych językach, ponieważ wskazują na rzeczywiste pliki w twoim folderze Drive.</i>',
+    fa:'<b>لینک‌ها چگونه کار می‌کنند:</b> یک ارجاع کتاب‌مقدسی، Bible&nbsp;Gateway (نسخه ESV) را باز می‌کند؛ یک منبع نام‌برده‌شده، یک جست‌وجو در Google&nbsp;Drive باز می‌کند تا به فایل (یا فایل‌های) درست در پوشه‌ی <code>AI/ClaudeCowork/iDisciple</code> برسی — به شرطی که به همان حساب Drive وارد شده باشی که این پوشه در آن قرار دارد. این یک جست‌وجوست، نه همیشه یک فایل دقیق واحد، زیرا برخی حوزه‌ها به یک بخش کامل از طرح کلی مربوط می‌شوند نه یک سند. هیچ‌چیز مستقیماً در این صفحه جاسازی نشده، زیرا برخی مطالب (مانند Herschel Training Books) به نظر متعلق به منابع ثالث می‌رسند. مواردی که با عبارت <span class="tbd">«یک منبع اضافه کن»</span> مشخص شده‌اند هنوز تطابق روشنی ندارند — قدم بعدی خوب این است که مشخص کنی به چه چیزی باید اشاره کرد. پیشرفت تو فقط در همین مرورگر ذخیره می‌شود — در جای دیگری به اشتراک گذاشته یا همگام‌سازی نمی‌شود. <i>نام منابع حتی در زبان‌های دیگر نیز به انگلیسی باقی می‌مانند، زیرا به فایل‌های واقعی در پوشه‌ی Drive تو اشاره می‌کنند.</i>'
+  }
+};
+
+function t(key){
+  var row = UI_STRINGS[key];
+  if (!row) return key;
+  return row[currentLang] || row.en;
+}
+function trStage(id){
+  var row = STAGE_TR[id];
+  if (!row) return id;
+  return row[currentLang] || row.en;
+}
+function trDivLabel(id){
+  var row = DIV_TR[id];
+  if (!row) return id;
+  return row.label[currentLang] || row.label.en;
+}
+function trDivSub(id){
+  var row = DIV_TR[id];
+  if (!row) return "";
+  return row.sub[currentLang] || row.sub.en;
+}
+function trTitle(title){
+  var row = TITLE_TR[title];
+  if (!row) return title;
+  return row[currentLang] || title;
+}
+function fillTemplate(tpl, vals){
+  return tpl.replace(/\{(\w+)\}/g, function(_, k){ return (vals[k] != null) ? vals[k] : ""; });
+}
+
+// r = resource lines (array of strings). Each is plain text; a "(verify)" suffix
+// flags a first-pass guess rather than a confirmed match. Lines that look like a
+// Bible reference or a named resource are auto-linked at render time (see
+// resourceLink()) — to Bible Gateway, or to a Drive search in your iDisciple folder.
+var CHAR_TIM = "1 Tim 3:1–13";
+var CHAR_TITUS = "Titus 1:5–9";
+
+var ITEMS = [
+  // ---- CHARACTER ----
+  {stage:"nb", division:"character", title:"Reliable", r:[CHAR_TIM, CHAR_TITUS]},
+  {stage:"disciple", division:"character", title:"Faithful in physical areas", r:[CHAR_TIM, CHAR_TITUS]},
+  {stage:"disciple", division:"character", title:"Availability", r:[CHAR_TIM, CHAR_TITUS]},
+  {stage:"disciple", division:"character", title:"Teachability", r:[CHAR_TIM, CHAR_TITUS]},
+  {stage:"disciple", division:"character", title:"Obedience", r:[CHAR_TIM, CHAR_TITUS]},
+  {stage:"disciple", division:"character", title:"Humility", r:[CHAR_TIM, CHAR_TITUS, "Building Convictions — “4. Who is the greatest”"]},
+  {stage:"disciple", division:"character", title:"Heart for God", r:[CHAR_TIM, CHAR_TITUS, "Building Convictions — “1. Staying close to God”"]},
+  {stage:"disciple", division:"character", title:"Faith", r:[CHAR_TIM, CHAR_TITUS, "Building Convictions — “2. Crave the word”"]},
+  {stage:"worker", division:"character", title:"Faithful in spiritual areas", r:[CHAR_TIM, CHAR_TITUS, "Building Convictions — “14. Filled, walking”"]},
+  {stage:"worker", division:"character", title:"Vision to be used by God", r:[CHAR_TIM, CHAR_TITUS]},
+  {stage:"worker", division:"character", title:"Servant's heart", r:[CHAR_TIM, CHAR_TITUS, "New Life Bible Studies 8.1 — Being others oriented (Serving1.PDF)"]},
+  {stage:"worker", division:"character", title:"Submission", r:[CHAR_TIM, CHAR_TITUS]},
+  {stage:"worker", division:"character", title:"Hospitable", r:[CHAR_TIM, CHAR_TITUS, "Building Convictions — “21. Hospitality”"]},
+  {stage:"leader", division:"character", title:"Above reproach", r:[CHAR_TIM, CHAR_TITUS, "Titus 1:6–7"]},
+  {stage:"leader", division:"character", title:"A pacesetter", r:[CHAR_TIM, CHAR_TITUS]},
+  {stage:"leader", division:"character", title:"A shepherd's heart", r:[CHAR_TIM, CHAR_TITUS, "1 Peter 5:2–4"]},
+  {stage:"leader", division:"character", title:"Wisdom / discernment", r:[CHAR_TIM, CHAR_TITUS]},
+  {stage:"leader", division:"character", title:"Faith and prayer", r:[CHAR_TIM, CHAR_TITUS, "Building Convictions — “3. Pray”", "Building Convictions — “Mountain, moving faith”"]},
+
+  // ---- LEARN (Doctrine) ----
+  {stage:"nb", division:"learn", title:"Assurance of salvation", r:["New Life Bible Studies 1.3–1.5 — The process of salvation (LifeinChrist)", "New Life PDFs — “Beginning in Christ” booklet (EN/DE)"]},
+  {stage:"disciple", division:"learn", title:"Deity of Christ", r:["New Life Bible Studies 0.1 — The Person Jesus (nlbs0_1.doc)"]},
+  {stage:"disciple", division:"learn", title:"Eternal security", r:["New Life Bible Studies 1.3–1.5 — The process of salvation (same studies as Assurance of Salvation) (LifeinChrist)"]},
+  {stage:"disciple", division:"learn", title:"Holiness", r:["New Life Bible Studies 4.1 — The call to live holy lives (BeYeHoly1.PDF)", "“Be Ye Holy” study series, parts 1–5"]},
+  {stage:"disciple", division:"learn", title:"Holy Spirit", r:["New Life Bible Studies ch. 3 — Your new Helper: The Holy Spirit (HolySpirit)", "“Holy Spirit” study series, parts 1–5"]},
+  {stage:"disciple", division:"learn", title:"Authority of Word of God", r:["New Life Bible Studies 5.2 — The authority of God's word (TheWord2.PDF)"]},
+  {stage:"disciple", division:"learn", title:"The church", r:["New Life Bible Studies ch. 2 — My new life in God's family (TheChurch)", "“The Church” study series, parts 1–5"]},
+  {stage:"disciple", division:"learn", title:"The Great Commission", r:["New Life Bible Studies ch. 10 — Your new purpose: The Great Commission (TheGC)", "“The GC” study series, parts 1–5", "Great Commission Workbook (GCW2018) — full 7-unit study"]},
+  {stage:"worker", division:"learn", title:"Attributes of God", r:["Herschel Training Books — Book 1, “God's Characteristics” section"]},
+  {stage:"worker", division:"learn", title:"Second coming", r:["New Life Bible Studies 7.3 — Christ's return and the rapture (GodsValues3.PDF)", "Building Convictions — “20. Loving his appearing”"]},
+  {stage:"worker", division:"learn", title:"Apologetics", r:["add a resource"]},
+  {stage:"worker", division:"learn", title:"False doctrine", r:["add a resource"]},
+  {stage:"leader", division:"learn", title:"Sound doctrine", r:["Titus 1:9", "add a resource"]},
+  {stage:"leader", division:"learn", title:"Deep convictions", r:["Building Convictions series (20 studies) — whole series"]},
+  {stage:"leader", division:"learn", title:"Able to refute wrong doctrine", r:["Titus 1:9", "add a resource"]},
+
+  // ---- PRACTICE (Conduct) ----
+  {stage:"nb", division:"practice", title:"Quiet Time", r:["New Life Bible Studies 6.1 — The daily quiet time (Maturity1.PDF)"]},
+  {stage:"nb", division:"practice", title:"Fellowship", r:["New Life Bible Studies 2.3–2.4 — The body in action; Loving one another (TheChurch)", "Building Convictions — “12. Love”"]},
+  {stage:"nb", division:"practice", title:"Baptism", r:["New Life Bible Studies 1.2 — The indwelling Christ and baptism (nlbs1_2.doc)"]},
+  {stage:"disciple", division:"practice", title:"Studying God's Word", r:["New Life Bible Studies ch. 5 — Your new guidebook: God's Word (TheWord)", "“The Word” study series, parts 1–5"]},
+  {stage:"disciple", division:"practice", title:"Prayer", r:["New Life Bible Studies 6.3 — Prayer / fasting / listening (Maturity3.PDF)", "Building Convictions — “3. Pray”"]},
+  {stage:"disciple", division:"practice", title:"Witnessing", r:["New Life Bible Studies ch. 9 — Being an effective witness (Witness)", "“Witness” study series, parts 1–5"]},
+  {stage:"disciple", division:"practice", title:"Serving", r:["New Life Bible Studies 8.2 — Being a sacrificial servant (Serving2.PDF)", "“Serving” study series, parts 1–5"]},
+  {stage:"disciple", division:"practice", title:"Giving (tithing)", r:["New Life Bible Studies 6.4 — Giving / rejoicing / worship (Maturity4.PDF)", "Building Convictions — “18. Giving”"]},
+  {stage:"disciple", division:"practice", title:"Victory over sin", r:["New Life Bible Studies 4.5 — Steps to wholeness: walking in victory (BeYeHoly5.PDF)", "New Life Bible Studies 8.3 — The spiritual battle (Serving3.PDF)", "Building Convictions — “11. Victory”", "Building Convictions — “16. Weapons”"]},
+  {stage:"disciple", division:"practice", title:"Discover spiritual gift", r:["New Life Bible Studies 8.4 — Using your spiritual gifts to serve others (Serving4.PDF)"]},
+  {stage:"worker", division:"practice", title:"Extended time with God", r:["New Life Bible Studies 6.1–6.3, deepened (Maturity)"]},
+  {stage:"worker", division:"practice", title:"Discipling", r:["This project itself — New Life Bible Studies 10.4 — The example of the early church (TheGC4.PDF)"]},
+  {stage:"worker", division:"practice", title:"Co-laboring / unity", r:["New Life Bible Studies 10.3 — The example of the Apostle Paul (TheGC3.PDF)", "Building Convictions — “5. Resolving tension”"]},
+  {stage:"worker", division:"practice", title:"Sacrificial lifestyle", r:["New Life Bible Studies 8.1–8.2 — Being others oriented; being a sacrificial servant (Serving)"]},
+  {stage:"worker", division:"practice", title:"Giving and receiving reproof", r:["add a resource"]},
+  {stage:"worker", division:"practice", title:"Develop spiritual gift", r:["New Life Bible Studies 8.5 — Using your spiritual gifts to serve others, continued (Serving5.PDF)"]},
+  {stage:"leader", division:"practice", title:"Teaching", r:["add a resource"]},
+  {stage:"leader", division:"practice", title:"Preaching", r:["add a resource"]},
+  {stage:"leader", division:"practice", title:"Exhorting (motivating)", r:["add a resource"]},
+  {stage:"leader", division:"practice", title:"Counseling", r:["add a resource"]},
+  {stage:"leader", division:"practice", title:"Managing one's household", r:["1 Tim 3:4–5", "Titus 1:6", "Herschel Training Books — Book 3, “Design and Purpose of the Family”"]},
+  {stage:"leader", division:"practice", title:"Administration", r:["add a resource"]},
+  {stage:"leader", division:"practice", title:"Overseeing", r:["1 Tim 3:1", "Herschel Training Books — Book 3, “Design and Purpose of the Church”"]}
+];
+
+ITEMS.forEach(function(it, i){ it.id = it.stage + "__" + it.division + "__" + i; });
+
+// ---- state (per-browser only) ----
+var STORE_KEY = "discipling-pathway-v1";
+var state = {};
+try {
+  var raw = localStorage.getItem(STORE_KEY);
+  if (raw) state = JSON.parse(raw) || {};
+} catch(e) { state = {}; }
+
+function save(){
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function isChecked(id){ return !!state[id]; }
+function setChecked(id, val){ state[id] = val; save(); }
+
+var currentStage = STAGES[0].id;
+
+var LANG_KEY = "discipling-pathway-lang-v1";
+var currentLang = "en";
+try {
+  var savedLang = localStorage.getItem(LANG_KEY);
+  if (savedLang && LANGS.indexOf(savedLang) !== -1) currentLang = savedLang;
+} catch(e) {}
+
+function applyStaticI18n(){
+  document.getElementById("eyebrowText").textContent =
+    STAGES.map(function(s){ return trStage(s.id); }).join(" → ");
+  document.getElementById("ledeText").innerHTML = t("lede");
+  document.getElementById("recordTitleText").textContent = t("recordTitle");
+  document.getElementById("lblDisciple").textContent = t("labelDisciple");
+  document.getElementById("lblDiscipler").textContent = t("labelDiscipler");
+  document.getElementById("lblDate").textContent = t("labelDate");
+  document.getElementById("lblNextSteps").textContent = t("labelNextSteps");
+  document.getElementById("lblDueDate").textContent = t("labelDueDate");
+  document.getElementById("rfDisciple").placeholder = t("placeholderName");
+  document.getElementById("rfDiscipler").placeholder = t("placeholderName");
+  document.getElementById("rfNextSteps").placeholder = t("placeholderNextSteps");
+  var printBtn = document.getElementById("printBtn");
+  if (printBtn && !printBtn.disabled) printBtn.textContent = t("btnDownload");
+  document.getElementById("overviewTitleText").textContent = t("overviewTitle");
+  document.getElementById("overviewHintText").textContent = t("overviewHint");
+  document.getElementById("nextStepsLabel").textContent = t("nextStepsLabel");
+  document.getElementById("footerNote").innerHTML = t("footerNote");
+  applyCourseI18n();
+  applyTourI18n();
+
+  document.querySelectorAll(".lang-btn").forEach(function(btn){
+    btn.classList.toggle("active", btn.getAttribute("data-lang") === currentLang);
+  });
+  if (document.documentElement) {
+    document.documentElement.lang = currentLang;
+    document.documentElement.dir = RTL_LANGS.indexOf(currentLang) !== -1 ? "rtl" : "ltr";
+  }
+}
+
+document.querySelectorAll(".lang-btn").forEach(function(btn){
+  btn.innerHTML = '<span class="flag">' + LANG_FLAGS[btn.getAttribute("data-lang")] + '</span> ' + LANG_NAMES[btn.getAttribute("data-lang")];
+  btn.addEventListener("click", function(){
+    currentLang = btn.getAttribute("data-lang");
+    try { localStorage.setItem(LANG_KEY, currentLang); } catch(e) {}
+    applyStaticI18n();
+    renderAll();
+  });
+});
+
+function itemsFor(stageId, divisionId){
+  return ITEMS.filter(function(it){ return it.stage===stageId && it.division===divisionId; });
+}
+function stagePct(stageId){
+  var items = ITEMS.filter(function(it){ return it.stage===stageId; });
+  if (!items.length) return 0;
+  var done = items.filter(function(it){ return isChecked(it.id); }).length;
+  return Math.round(done/items.length*100);
+}
+
+function renderNav(){
+  var nav = document.getElementById("stageNav");
+  nav.innerHTML = "";
+  STAGES.forEach(function(s){
+    var btn = document.createElement("button");
+    btn.className = "stage-btn" + (s.id===currentStage ? " active" : "");
+    var pct = stagePct(s.id);
+    btn.innerHTML =
+      '<span class="stage-ring" style="--pct:'+pct+'" data-pct="'+pct+'"></span>' +
+      '<span class="stage-name">'+escapeHtml(trStage(s.id))+'</span>';
+    btn.addEventListener("click", function(){ currentStage = s.id; renderAll(); });
+    nav.appendChild(btn);
+  });
+}
+
+function firstUnchecked(stageId, divisionId){
+  var items = itemsFor(stageId, divisionId);
+  for (var i=0;i<items.length;i++){ if(!isChecked(items[i].id)) return items[i]; }
+  return null;
+}
+
+function renderNextSteps(){
+  document.getElementById("stageLabelInline").textContent =
+    "— " + trStage(currentStage);
+  var grid = document.getElementById("nextGrid");
+  grid.innerHTML = "";
+  var anyOpen = false;
+  DIVISIONS.forEach(function(div){
+    var next = firstUnchecked(currentStage, div.id);
+    var card = document.createElement("div");
+    if (!next){
+      card.className = "next-card all-done";
+      card.textContent = fillTemplate(t("allDoneTemplate"), {division: trDivLabel(div.id)});
+      grid.appendChild(card);
+      return;
+    }
+    anyOpen = true;
+    card.className = "next-card";
+    card.style.setProperty("--card-color", div.color);
+    var resHtml = next.r.map(function(line){ return resLineHtml(line); }).join("");
+    card.innerHTML =
+      '<div class="division">'+escapeHtml(trDivLabel(div.id))+' &middot; '+escapeHtml(trDivSub(div.id))+'</div>' +
+      '<div class="item-title">'+escapeHtml(trTitle(next.title))+'</div>' +
+      '<div class="res">'+resHtml+'</div>' + ccButtonHtml(next.title) +
+      '<label class="done-check"><input type="checkbox" class="chk" data-id="'+next.id+'"> '+escapeHtml(t("markDone"))+'</label>';
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+    cb.addEventListener("change", function(){
+      setChecked(cb.getAttribute("data-id"), cb.checked);
+      renderAll();
+    });
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+
+// A resource line either IS a Bible reference ("Titus 1:9"), or names something
+// findable in the iDisciple Google Drive folder. This maps a line to a URL —
+// Bible Gateway for a reference, a Drive search for a named resource — or
+// returns null for plain notes ("add a resource") that aren't a real target yet.
+var BIBLE_LINE_RE = /^[1-3]?\s?[A-Za-z]+(?:\s[A-Za-z]+)?\s\d{1,3}:\d{1,3}(?:[–-]\d{1,3})?$/;
+var DRIVE_RULES = [
+  {test:/Be Ye Holy/i, q:"BeYeHoly"},
+  {test:/Holy Spirit.*study series/i, q:"HolySpirit"},
+  {test:/The Church.*study series/i, q:"TheChurch"},
+  {test:/The GC.*study series/i, q:"TheGC"},
+  {test:/God's Values/i, q:"GodsValues"},
+  {test:/The Word.*study series/i, q:"TheWord"},
+  {test:/Witness.*study series/i, q:"Witness"},
+  {test:/Serving.*study series/i, q:"Serving"},
+  {test:/Building Convictions.*[“]([^”]+)[”]/i, qFrom:1},
+  {test:/Building Convictions series/i, q:"Building Convictions"},
+  {test:/Herschel Training/i, q:"basics-book"},
+  {test:/Great Commission Workbook|GCW2018/i, q:"GCW2018"},
+  {test:/Beginning in Christ.*booklet/i, q:"Beginn"},
+  // A resource line ending "(ExactFile.pdf)" or "(nlbs1_2.doc)" names one specific lesson
+  // file in the NewLifeStudies-Kern folder — search for that file directly rather than
+  // falling through to the generic NLBS search below, which surfaces every NLBS-related
+  // file in the whole Drive (including old duplicates) instead of the one lesson meant.
+  {test:/\(([\w]+\.(?:PDF|pdf|doc|docx))\)\s*$/, qFrom:1},
+  // A trailing "(SeriesName)" with no extension names a whole named series (e.g. "(Maturity)",
+  // "(TheChurch)") when a citation spans more than one file in that series — narrows the
+  // search to that series instead of every "New Life Bible Studies" file in Drive.
+  {test:/\(([A-Za-z]+)\)\s*$/, qFrom:1},
+  {test:/New Life Bible Studies/i, q:"NLBS"}
+];
+function resourceLink(text){
+  var t = text.trim();
+  if (BIBLE_LINE_RE.test(t)){
+    return "https://www.biblegateway.com/passage/?search=" + encodeURIComponent(t) + "&version=ESV";
+  }
+  for (var i=0;i<DRIVE_RULES.length;i++){
+    var rule = DRIVE_RULES[i];
+    var m = t.match(rule.test);
+    if (m){
+      var q = rule.qFrom ? m[rule.qFrom] : rule.q;
+      return "https://drive.google.com/drive/search?q=" + encodeURIComponent(q);
+    }
+  }
+  return null;
+}
+function resLineHtml(line, extraClass){
+  var href = resourceLink(line);
+  var cls = "res-line" + (extraClass ? " " + extraClass : "");
+  var displayText = /^add a resource$/i.test(line) ? t("addResource") : line;
+  var body = escapeHtml(displayText);
+  if (href){
+    return '<div class="'+cls+'"><a href="'+href+'" target="_blank" rel="noopener noreferrer">'+body+'</a></div>';
+  }
+  return '<div class="'+cls+'">'+body+'</div>';
+}
+
+function renderColumns(){
+  var wrap = document.getElementById("columns");
+  wrap.innerHTML = "";
+  DIVISIONS.forEach(function(div){
+    var col = document.createElement("div");
+    col.className = "col " + div.id;
+    var items = itemsFor(currentStage, div.id);
+    var doneCount = items.filter(function(it){return isChecked(it.id);}).length;
+    var head = document.createElement("div");
+    head.className = "col-head";
+    head.innerHTML = '<div class="label" style="color:'+div.color+'">'+escapeHtml(trDivLabel(div.id))+'</div>' +
+      '<div class="sub">'+escapeHtml(trDivSub(div.id))+' &middot; '+escapeHtml(fillTemplate(t("doneOfTemplate"), {done:doneCount, total:items.length}))+'</div>';
+    col.appendChild(head);
+    var body = document.createElement("div");
+    body.className = "col-body";
+    items.forEach(function(it){
+      var row = document.createElement("div");
+      row.className = "item" + (isChecked(it.id) ? " checked" : "");
+      var resHtml = it.r.map(function(line){
+        var tbd = /^add a resource$/i.test(line);
+        return resLineHtml(line, tbd ? "tbd" : "");
+      }).join("");
+      row.innerHTML =
+        '<div class="item-row">' +
+          '<input type="checkbox" class="chk" data-id="'+it.id+'" '+(isChecked(it.id)?"checked":"")+'>' +
+          '<div class="item-title-row">'+escapeHtml(trTitle(it.title))+'</div>' +
+          '<div class="caret">&#9656;</div>' +
+        '</div>' +
+        '<div class="item-detail">'+resHtml+ccButtonHtml(it.title)+'</div>';
+      var titleRow = row.querySelector(".item-row");
+      titleRow.addEventListener("click", function(e){
+        if (e.target.classList.contains("chk")) return;
+        row.classList.toggle("open");
+      });
+      var cb = row.querySelector(".chk");
+      cb.addEventListener("click", function(e){ e.stopPropagation(); });
+      cb.addEventListener("change", function(){
+        setChecked(it.id, cb.checked);
+        renderAll();
+      });
+      body.appendChild(row);
+    });
+    col.appendChild(body);
+    wrap.appendChild(col);
+  });
+}
+
+function renderOverview(){
+  var table = document.getElementById("overviewTable");
+  var theadHtml = '<thead><tr><th class="corner"></th>' +
+    STAGES.map(function(s){ return '<th data-stage="'+s.id+'">'+escapeHtml(trStage(s.id))+'</th>'; }).join("") +
+    '</tr></thead>';
+  var bodyRows = DIVISIONS.map(function(div){
+    var cells = STAGES.map(function(s){
+      var items = itemsFor(s.id, div.id);
+      var itemsHtml = items.map(function(it){
+        return '<label class="mini-item'+(isChecked(it.id)?" checked":"")+'">' +
+          '<input type="checkbox" class="chk" data-id="'+it.id+'" '+(isChecked(it.id)?"checked":"")+'>' +
+          '<span>'+escapeHtml(trTitle(it.title))+'</span></label>';
+      }).join("");
+      return '<td>'+itemsHtml+'</td>';
+    }).join("");
+    return '<tr><th class="row-label" style="border-left:4px solid '+div.color+'; color:'+div.color+'">'+escapeHtml(trDivLabel(div.id))+'</th>'+cells+'</tr>';
+  }).join("");
+  table.innerHTML = theadHtml + '<tbody>'+bodyRows+'</tbody>';
+
+  table.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+    cb.addEventListener("click", function(e){ e.stopPropagation(); });
+    cb.addEventListener("change", function(){
+      setChecked(cb.getAttribute("data-id"), cb.checked);
+      renderAll();
+    });
+  });
+  table.querySelectorAll('thead th[data-stage]').forEach(function(th){
+    th.addEventListener("click", function(){
+      currentStage = th.getAttribute("data-stage");
+      renderAll();
+      var nav = document.getElementById("stageNav");
+      if (nav) nav.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  });
+}
+
+function renderAll(){
+  renderViews();
+  renderOverview();
+  renderNav();
+  renderNextSteps();
+  renderColumns();
+  renderCourses();
+}
+
+// ===========================================================================
+// COURSE LIBRARY
+// A course is an ordered list of sessions. Each session names the chart items
+// (by their English title in ITEMS) that it covers, so each course's coverage
+// of the 4 stages x 3 areas grid is computed rather than typed by hand.
+// Files: a string means an English file; {en:..., de:...} lists per-language files.
+// A session with no file yet is shown dimmed ("no file yet").
+// ===========================================================================
+var COURSE_UI = {
+  tabPathway: {en:"Pathway", uk:"Шлях", de:"Weg", es:"Camino", it:"Percorso", pl:"Ścieżka", fa:"مسیر"},
+  tabCourses: {en:"Courses", uk:"Курси", de:"Kurse", es:"Cursos", it:"Corsi", pl:"Kursy", fa:"دوره‌ها"},
+  coursesTitle: {en:"Course Library", uk:"Бібліотека курсів", de:"Kursbibliothek", es:"Biblioteca de cursos", it:"Biblioteca dei corsi", pl:"Biblioteka kursów", fa:"کتابخانه دوره‌ها"},
+  coursesHint: {
+    en:"Whole courses to go through with someone. Each card shows which areas of the chart the course covers — darker cells mean more of that cell’s items are covered. Click a cell to see which items, or open the sessions to get the files. Course and lesson names stay in English because they match your file names.",
+    uk:"Цілі курси, які можна пройти разом з кимось. Кожна картка показує, які сфери схеми охоплює курс — темніші клітинки означають, що охоплено більше пунктів. Натисни на клітинку, щоб побачити пункти, або відкрий сесії, щоб дістатися до файлів. Назви курсів і занять залишаються англійською, бо збігаються з назвами твоїх файлів.",
+    de:"Ganze Kurse, die du mit jemandem durcharbeiten kannst. Jede Karte zeigt, welche Bereiche des Schemas der Kurs abdeckt — dunklere Felder bedeuten mehr abgedeckte Punkte. Klicke auf ein Feld, um die Punkte zu sehen, oder öffne die Einheiten, um zu den Dateien zu gelangen. Kurs- und Lektionsnamen bleiben englisch, da sie zu deinen Dateinamen passen.",
+    es:"Cursos completos para recorrer junto con alguien. Cada tarjeta muestra qué áreas del cuadro cubre el curso: las casillas más oscuras indican que se cubren más elementos. Haz clic en una casilla para ver cuáles, o abre las sesiones para llegar a los archivos. Los nombres de cursos y lecciones permanecen en inglés porque coinciden con los nombres de tus archivos.",
+    it:"Corsi completi da percorrere insieme a qualcuno. Ogni scheda mostra quali aree dello schema il corso copre: le caselle più scure indicano più voci coperte. Clicca su una casella per vedere quali, oppure apri gli incontri per raggiungere i file. I nomi dei corsi e delle lezioni restano in inglese perché corrispondono ai nomi dei tuoi file.",
+    pl:"Całe kursy do przejścia razem z kimś. Każda karta pokazuje, które obszary schematu obejmuje kurs — ciemniejsze pola oznaczają więcej objętych pozycji. Kliknij pole, aby zobaczyć które, lub otwórz spotkania, aby przejść do plików. Nazwy kursów i lekcji pozostają po angielsku, ponieważ odpowiadają nazwom twoich plików.",
+    fa:"دوره‌های کامل برای گذراندن همراه با دیگری. هر کارت نشان می‌دهد این دوره کدام حوزه‌های نمودار را پوشش می‌دهد — خانه‌های تیره‌تر یعنی موارد بیشتری پوشش داده شده است. روی یک خانه کلیک کن تا موارد را ببینی، یا جلسات را باز کن تا به فایل‌ها برسی. نام دوره‌ها و درس‌ها به انگلیسی می‌ماند چون با نام فایل‌های تو یکی است."
+  },
+  fStage: {en:"Stage", uk:"Етап", de:"Stufe", es:"Etapa", it:"Fase", pl:"Etap", fa:"مرحله"},
+  fArea: {en:"Area", uk:"Сфера", de:"Bereich", es:"Área", it:"Area", pl:"Obszar", fa:"حوزه"},
+  fAll: {en:"All", uk:"Усі", de:"Alle", es:"Todas", it:"Tutte", pl:"Wszystkie", fa:"همه"},
+  matLangLabel: {en:"Material language", uk:"Мова матеріалів", de:"Sprache der Materialien", es:"Idioma del material", it:"Lingua del materiale", pl:"Język materiałów", fa:"زبان مطالب"},
+  matLangAuto: {en:"Same as interface", uk:"Як в інтерфейсі", de:"Wie die Oberfläche", es:"Igual que la interfaz", it:"Come l’interfaccia", pl:"Jak interfejs", fa:"مثل رابط کاربری"},
+  sessionsCount: {en:"Sessions: {n}", uk:"Сесій: {n}", de:"Einheiten: {n}", es:"Sesiones: {n}", it:"Incontri: {n}", pl:"Spotkań: {n}", fa:"جلسات: {n}"},
+  showSessions: {en:"Show sessions", uk:"Показати сесії", de:"Einheiten anzeigen", es:"Mostrar sesiones", it:"Mostra gli incontri", pl:"Pokaż spotkania", fa:"نمایش جلسات"},
+  hideSessions: {en:"Hide sessions", uk:"Сховати сесії", de:"Einheiten ausblenden", es:"Ocultar sesiones", it:"Nascondi gli incontri", pl:"Ukryj spotkania", fa:"پنهان کردن جلسات"},
+  coversTotal: {en:"Covers {c} of {t} chart items", uk:"Охоплює {c} із {t} пунктів схеми", de:"Deckt {c} von {t} Punkten des Schemas ab", es:"Cubre {c} de {t} elementos del cuadro", it:"Copre {c} voci su {t} dello schema", pl:"Obejmuje {c} z {t} pozycji schematu", fa:"{c} از {t} مورد نمودار را پوشش می‌دهد"},
+  coversOpen: {en:"{n} still-open items in {stage}", uk:"{n} невиконаних пунктів на етапі {stage}", de:"{n} noch offene Punkte bei {stage}", es:"{n} elementos pendientes en {stage}", it:"{n} voci ancora aperte in {stage}", pl:"{n} niewykonanych pozycji na etapie {stage}", fa:"{n} مورد باز در مرحله {stage}"},
+  notCoveredHere: {en:"Not covered by this course:", uk:"Цей курс не охоплює:", de:"Von diesem Kurs nicht abgedeckt:", es:"No cubierto por este curso:", it:"Non coperto da questo corso:", pl:"Nieobjęte przez ten kurs:", fa:"در این دوره پوشش داده نشده:"},
+  wholeCourse: {en:"whole course", uk:"весь курс", de:"ganzer Kurs", es:"todo el curso", it:"tutto il corso", pl:"cały kurs", fa:"کل دوره"},
+  noFileYet: {en:"no file yet", uk:"файлу ще немає", de:"noch keine Datei", es:"aún sin archivo", it:"ancora nessun file", pl:"brak pliku", fa:"هنوز فایلی نیست"},
+  notInLang: {en:"Not available in {lang} yet — showing the English files.", uk:"Ще немає мовою {lang} — показано англійські файли.", de:"Noch nicht auf {lang} verfügbar — es werden die englischen Dateien gezeigt.", es:"Aún no disponible en {lang}: se muestran los archivos en inglés.", it:"Non ancora disponibile in {lang}: vengono mostrati i file in inglese.", pl:"Jeszcze niedostępne w języku {lang} — pokazano pliki angielskie.", fa:"هنوز به زبان {lang} موجود نیست — فایل‌های انگلیسی نمایش داده می‌شود."},
+  partInLang: {en:"In {lang} for {n} of {total} sessions — the rest show the English file.", uk:"Мовою {lang} є для {n} із {total} сесій — для решти показано англійський файл.", de:"Auf {lang} für {n} von {total} Einheiten — bei den übrigen wird die englische Datei gezeigt.", es:"En {lang} para {n} de {total} sesiones; el resto muestra el archivo en inglés.", it:"In {lang} per {n} incontri su {total}: per gli altri si mostra il file in inglese.", pl:"W języku {lang} dla {n} z {total} spotkań — pozostałe pokazują plik angielski.", fa:"به زبان {lang} برای {n} از {total} جلسه موجود است — بقیه فایل انگلیسی را نشان می‌دهند."},
+  availIn: {en:"Files in:", uk:"Файли мовами:", de:"Dateien in:", es:"Archivos en:", it:"File in:", pl:"Pliki w językach:", fa:"فایل‌ها به زبان:"},
+  coursesCovering: {en:"Courses covering: {item}", uk:"Курси, що охоплюють: {item}", de:"Kurse, die abdecken: {item}", es:"Cursos que cubren: {item}", it:"Corsi che coprono: {item}", pl:"Kursy obejmujące: {item}", fa:"دوره‌هایی که پوشش می‌دهند: {item}"},
+  clearFilter: {en:"Clear", uk:"Скинути", de:"Zurücksetzen", es:"Quitar", it:"Rimuovi", pl:"Wyczyść", fa:"پاک کردن"},
+  ccBtn: {en:"Courses covering this ({n}) ›", uk:"Курси, що це охоплюють ({n}) ›", de:"Kurse dazu ({n}) ›", es:"Cursos que lo cubren ({n}) ›", it:"Corsi che lo coprono ({n}) ›", pl:"Kursy na ten temat ({n}) ›", fa:"دوره‌های مرتبط ({n}) ›"},
+  noCourses: {en:"No course in the library covers this yet.", uk:"Жоден курс у бібліотеці поки що цього не охоплює.", de:"Noch kein Kurs in der Bibliothek deckt das ab.", es:"Ningún curso de la biblioteca cubre esto todavía.", it:"Nessun corso della biblioteca copre ancora questo.", pl:"Żaden kurs w bibliotece jeszcze tego nie obejmuje.", fa:"هنوز هیچ دوره‌ای در کتابخانه این را پوشش نمی‌دهد."},
+  approxBadge: {en:"rough mapping", uk:"приблизне зіставлення", de:"grobe Zuordnung", es:"correspondencia aproximada", it:"corrispondenza approssimativa", pl:"przybliżone dopasowanie", fa:"تطبیق تقریبی"},
+  sessionNoun: {en:"session", uk:"сесія", de:"Einheit", es:"sesión", it:"incontro", pl:"spotkanie", fa:"جلسه"}
+};
+Object.keys(COURSE_UI).forEach(function(k){ UI_STRINGS[k] = COURSE_UI[k]; });
+
+function ses(n, title, f, items, pg){
+  var files = (typeof f === "string") ? {en:f} : (f || null);
+  return {n:n, title:title, f:files, items:items || [], pg:pg || null};
+}
+
+var COURSES = [
+  {
+    id:"nlbs", title:"New Life Bible Studies",
+    by:"11 weeks · 5 short studies a week",
+    blurb:"A week-by-week foundation for a new believer: finding new life, your position in Christ, God’s family, the Holy Spirit, holy living, God’s Word, habits of maturity, eternal values, serving, witnessing and the Great Commission. Daily studies to work through with a discipler.",
+    groups:[
+      {name:"Week 0 — Finding New Life in Christ", sessions:[
+        ses("0.1","The Person Jesus","nlbs0_1.doc",["Deity of Christ"]),
+        ses("0.2","The Mission of Christ","nlbs0_2.doc",["Assurance of salvation"]),
+        ses("0.3","Where Not to Find New Life","nlbs0_3.doc",["Assurance of salvation"]),
+        ses("0.4","New Life: From God","nlbs0_4.doc",["Assurance of salvation"]),
+        ses("0.5","New Life: My Choice","nlbs0_5.doc",["Assurance of salvation"])
+      ]},
+      {name:"Week 1 — Your New Life in Christ", sessions:[
+        ses("1.1","My Position in Christ: Every Spiritual Blessing","nlbs1_1.doc",["Assurance of salvation"]),
+        ses("1.2","The Indwelling Christ and Baptism","nlbs1_2.doc",["Baptism"]),
+        ses("1.3","The Process of Salvation: Past","LifeinChrist3.PDF",["Assurance of salvation","Eternal security"]),
+        ses("1.4","The Process of Salvation: Future","LifeinChrist4.PDF",["Assurance of salvation","Eternal security"]),
+        ses("1.5","The Process of Salvation: Present","LifeinChrist5.PDF",["Assurance of salvation","Eternal security"])
+      ]},
+      {name:"Week 2 — Your New Life in God’s Family", sessions:[
+        ses("2.1","What is the Church?","TheChurch1.PDF",["The church"]),
+        ses("2.2","A Member of His Body","TheChurch2.PDF",["The church","Fellowship"]),
+        ses("2.3","The Body in Action","TheChurch3.PDF",["Fellowship","The church"]),
+        ses("2.4","Loving One Another","TheChurch4.PDF",["Fellowship"]),
+        ses("2.5","Leadership of the Local Church and the Membership Commitment","TheChurch5.PDF",["The church","Submission","Overseeing"])
+      ]},
+      {name:"Week 3 — Your New Helper: The Holy Spirit", sessions:[
+        ses("3.1","Who Is He?","HolySpirit1.PDF",["Holy Spirit"]),
+        ses("3.2","The Holy Spirit Lives in You!","HolySpirit2.PDF",["Holy Spirit"]),
+        ses("3.3","How to Be Filled with the Holy Spirit","HolySpirit3.PDF",["Holy Spirit","Faithful in spiritual areas"]),
+        ses("3.4","Power to Live the Christian Life — Part 1","HolySpirit4.PDF",["Holy Spirit","Victory over sin"]),
+        ses("3.5","Power to Live the Christian Life — Part 2","HolySpirit5.PDF",["Holy Spirit","Victory over sin"])
+      ]},
+      {name:"Week 4 — Your New Lifestyle: A Call to Holy Living", sessions:[
+        ses("4.1","The Call to Live Holy Lives","BeYeHoly1.PDF",["Holiness"]),
+        ses("4.2","The Conflict of Our Two Natures","BeYeHoly2.PDF",["Holiness","Victory over sin"]),
+        ses("4.3","Steps to Wholeness — Enough of the Old Nature","BeYeHoly3.PDF",["Victory over sin"]),
+        ses("4.4","Steps to Wholeness — Coming to the Light","BeYeHoly4.PDF",["Victory over sin"]),
+        ses("4.5","Steps to Wholeness — Walking in Victory","BeYeHoly5.PDF",["Victory over sin"])
+      ]},
+      {name:"Week 5 — Your New Guidebook: God’s Word", sessions:[
+        ses("5.1","An Amazing Book","TheWord1.PDF",["Authority of Word of God","Studying God's Word"]),
+        ses("5.2","The Authority of Scripture","TheWord2.PDF",["Authority of Word of God"]),
+        ses("5.3","Inadequate Sources of Authority — Intellect, Experience, Tradition","TheWord3.PDF",["Authority of Word of God","False doctrine"]),
+        ses("5.4","Eternal Source of Wisdom and Righteousness","TheWord4.PDF",["Authority of Word of God","Wisdom / discernment"]),
+        ses("5.5","Learn to Study and Apply God’s Word","TheWord5.PDF",["Studying God's Word"])
+      ]},
+      {name:"Week 6 — Your New Habits: The Habits of Maturity", sessions:[
+        ses("6.1","The Process of Spiritual Maturity","Maturity1.PDF",["Quiet Time","Extended time with God"]),
+        ses("6.2","Deepening Your Walk with God: Obey, Memorize, Meditate","Maturity2.PDF",["Quiet Time","Studying God's Word","Obedience","Extended time with God"]),
+        ses("6.3","Deepening Your Walk with God: Pray and Fast","Maturity3.PDF",["Prayer","Extended time with God"]),
+        ses("6.4","Deepening Your Walk with God: Give, Rejoice, Worship","Maturity4.PDF",["Giving (tithing)"]),
+        ses("6.5","Renewing Your Mind","Maturity5.PDF",["Victory over sin"])
+      ]},
+      {name:"Week 7 — Your New Perspective: Eternal Things", sessions:[
+        ses("7.1","Eternal Values vs. Worldly Values — Part 1","GodsValues1.PDF",["Sacrificial lifestyle"]),
+        ses("7.2","Eternal vs. Worldly Values — Part 2","GodsValues2.PDF",["Sacrificial lifestyle","Wisdom / discernment"]),
+        ses("7.3","Christ’s Return and the Rapture","GodsValues3.PDF",["Second coming"]),
+        ses("7.4","Heaven, Hell and the Final Judgment","GodsValues4.PDF",["Second coming","Eternal security"]),
+        ses("7.5","Citizens of Another Kingdom","GodsValues5.PDF",["Sacrificial lifestyle","Vision to be used by God"])
+      ]},
+      {name:"Week 8 — Your New Role: Others-Oriented Sacrificial Servants", sessions:[
+        ses("8.1","Being Others Oriented","Serving1.PDF",["Servant's heart","Sacrificial lifestyle"]),
+        ses("8.2","Being a Sacrificial Servant","Serving2.PDF",["Serving","Sacrificial lifestyle"]),
+        ses("8.3","The Spiritual Battle","Serving3.PDF",["Victory over sin"]),
+        ses("8.4","Using Your Spiritual Gifts to Serve Others","Serving4.PDF",["Discover spiritual gift"]),
+        ses("8.5","Using Your Spiritual Gifts to Serve Others (continued)","Serving5.PDF",["Develop spiritual gift"])
+      ]},
+      {name:"Week 9 — Your New Lifestyle: Being an Effective Witness", sessions:[
+        ses("9.1","What is a Witness?","Witness1.PDF",["Witnessing"]),
+        ses("9.2","The Power of Prayer","Witness2.PDF",["Witnessing","Prayer"]),
+        ses("9.3","Living the Truth","Witness3.PDF",["Witnessing"]),
+        ses("9.4","Communicating the Truth","Witness4.PDF",["Witnessing"]),
+        ses("9.5","Networking Relationships","Witness5.PDF",["Witnessing","Hospitable"])
+      ]},
+      {name:"Week 10 — Your New Purpose: The Great Commission", sessions:[
+        ses("10.1","The Heart of God","TheGC1.PDF",["The Great Commission","Heart for God"]),
+        ses("10.2","The Great Commission","TheGC2.PDF",["The Great Commission"]),
+        ses("10.3","The Example of the Apostle Paul","TheGC3.PDF",["The Great Commission","Co-laboring / unity"]),
+        ses("10.4","The Example of the Early Church","TheGC4.PDF",["The Great Commission","Discipling"]),
+        ses("10.5","The Example of Christ","TheGC5.PDF",["The Great Commission","Vision to be used by God"])
+      ]}
+    ]
+  },
+  {
+    id:"bc", title:"Building Convictions",
+    by:"21 studies",
+    blurb:"Short studies that build deep convictions — staying close to God, craving the Word, prayer, humility, resolving tension, victory over sin, the Holy Spirit, giving, hospitality and loving Christ’s appearing.",
+    courseItems:["Deep convictions"],
+    groups:[{name:"", sessions:[
+      ses("1","Staying close to God","1. Staying close to God.doc",["Heart for God","Quiet Time"]),
+      ses("2","Crave the word","2. Crave the word.doc",["Studying God's Word","Faith"]),
+      ses("3","Pray","3. Pray.doc",["Prayer","Faith and prayer"]),
+      ses("4","Who is the greatest","4. Who is the greatest.doc",["Humility"]),
+      ses("5","Resolving tension","5. Resolving tension.doc",["Co-laboring / unity"]),
+      ses("6","(not in your folder yet)",null,[]),
+      ses("7","(not in your folder yet)",null,[]),
+      ses("8","(not in your folder yet)",null,[]),
+      ses("9","(not in your folder yet)",null,[]),
+      ses("10","Mountain, moving faith","Mountain, moving faith.doc",["Faith and prayer","Faith"]),
+      ses("11","Victory","11. Victory.doc",["Victory over sin"]),
+      ses("12","Love","12. Love.doc",["Fellowship"]),
+      ses("13","The Holy Spirit","13. The Holy Spirit.doc",["Holy Spirit"]),
+      ses("14","Filled, walking","14. Filled, walking.doc",["Faithful in spiritual areas","Holy Spirit"]),
+      ses("15","Satan","15. Satan.doc",["Victory over sin"]),
+      ses("16","Weapons","16. Weapons.doc",["Victory over sin"]),
+      ses("17","Bring thoughts captive","17. Bring thoughts captive.docx",["Victory over sin"]),
+      ses("18","Giving","18. Giving.docx",["Giving (tithing)"]),
+      ses("19","Obstacle","19. Obstacle.docx",[]),
+      ses("20","Loving his appearing","20. Loving his appearing.docx",["Second coming"]),
+      ses("21","Hospitality","21. Hospitality",["Hospitable"])
+    ]}]
+  },
+  {
+    id:"hb1", title:"Basic Training Manuals — Book 1: Basics about God",
+    by:"Mike Bergen · July 2026 · free to use with credit",
+    blurb:"A Bible-journal tool for knowing God: his greatness shown in history, salvation, his characteristics and his promises.",
+    groups:[{name:"", sessions:[
+      ses("p. 9","God’s Greatness Shown in History","basics-book-1-engl-july-2026-pdf.pdf",["Attributes of God","Heart for God"]),
+      ses("p. 36","God’s Salvation (journal pages)","basics-book-1-engl-july-2026-pdf.pdf",["Assurance of salvation","Holy Spirit"]),
+      ses("p. 45","God’s Characteristics (journal pages)","basics-book-1-engl-july-2026-pdf.pdf",["Attributes of God","Heart for God"]),
+      ses("p. 59","God’s Promises (journal pages)","basics-book-1-engl-july-2026-pdf.pdf",["Faith"]),
+      ses("App. 1","Practical Steps for Becoming a Spiritual Parent","basics-book-1-engl-july-2026-pdf.pdf",["Discipling"],"p. 66"),
+      ses("App. 2","Reasons We Know the Bible Is God’s Communication","basics-book-1-engl-july-2026-pdf.pdf",["Authority of Word of God"],"p. 69"),
+      ses("App. 3","The Most Influential Person in History","basics-book-1-engl-july-2026-pdf.pdf",["Deity of Christ"],"p. 71"),
+      ses("App. 4","God Uses All History to Make Himself Known","basics-book-1-engl-july-2026-pdf.pdf",["Attributes of God"],"p. 73")
+    ]}]
+  },
+  {
+    id:"hb2", title:"Basic Training Manuals — Book 2: Basics of God’s Training",
+    by:"Mike Bergen · July 2026 · free to use with credit",
+    blurb:"First steps for a new believer, then the 16 Basics — from believing God’s love and staying close to him, through humility, church, leadership, teamwork and influence, to the Great Commission, faith, love, victory and work.",
+    groups:[{name:"", sessions:[
+      ses("p. 10","First Steps for a New Believer","basics-book-2-engl-july-2026-pdf-3.pdf",["Assurance of salvation"]),
+      ses("Basic 1","God Trains Us to Believe His Love","basics-book-2-engl-july-2026-pdf-3.pdf",["Assurance of salvation","Heart for God"],"p. 14"),
+      ses("Basic 2","God Trains Us to Stay Close to Him","basics-book-2-engl-july-2026-pdf-3.pdf",["Heart for God","Quiet Time"],"p. 23"),
+      ses("Basic 3","God Trains Us to Feed on His Word","basics-book-2-engl-july-2026-pdf-3.pdf",["Studying God's Word"],"p. 32"),
+      ses("Basic 4","God Trains Us to Pray","basics-book-2-engl-july-2026-pdf-3.pdf",["Prayer"],"p. 37"),
+      ses("Basic 5","God Trains Us to Be Humble Servants","basics-book-2-engl-july-2026-pdf-3.pdf",["Servant's heart","Serving","Humility"],"p. 44"),
+      ses("Basic 6","God Trains Us to Humble Ourselves Before God","basics-book-2-engl-july-2026-pdf-3.pdf",["Humility","Obedience"],"p. 49"),
+      ses("Basic 7","God Trains Us to Humble Ourselves Before Others","basics-book-2-engl-july-2026-pdf-3.pdf",["Humility","Submission","Teachability","Giving and receiving reproof"],"p. 57"),
+      ses("Basic 8","God Trains Us as Members of His Church","basics-book-2-engl-july-2026-pdf-3.pdf",["The church","Fellowship"],"p. 70"),
+      ses("Basic 9","God Trains Us to Be Leaders","basics-book-2-engl-july-2026-pdf-3.pdf",["Overseeing","A pacesetter","A shepherd's heart"],"p. 77"),
+      ses("Basic 10","God Trains Us in Teamwork","basics-book-2-engl-july-2026-pdf-3.pdf",["Co-laboring / unity"],"p. 86"),
+      ses("Basic 11","God Trains Us to Influence People","basics-book-2-engl-july-2026-pdf-3.pdf",["Discipling","Exhorting (motivating)"],"p. 92"),
+      ses("Basic 12","God Trains Us to Fulfill the Great Commission","basics-book-2-engl-july-2026-pdf-3.pdf",["The Great Commission","Witnessing","Vision to be used by God"],"p. 106"),
+      ses("Basic 13","God Trains Us to Believe and Have Faith in God","basics-book-2-engl-july-2026-pdf-3.pdf",["Faith","Faith and prayer"],"p. 114"),
+      ses("Basic 14","God Trains Us to Love","basics-book-2-engl-july-2026-pdf-3.pdf",["Fellowship","Sacrificial lifestyle"],"p. 123"),
+      ses("Basic 15","God Trains Us to Live in Victory","basics-book-2-engl-july-2026-pdf-3.pdf",["Victory over sin"],"p. 132"),
+      ses("Basic 16","God Trains Us to Work","basics-book-2-engl-july-2026-pdf-3.pdf",["Reliable","Faithful in physical areas"],"p. 141"),
+      ses("App. 1","Practical Steps for Becoming a Spiritual Parent","basics-book-2-engl-july-2026-pdf-3.pdf",["Discipling"],"p. 151")
+    ]}]
+  },
+  {
+    id:"hb3", title:"Basic Training Manuals — Book 3: Basics of God’s Plan for Relationships",
+    by:"Mike Bergen · July 2026 · free to use with credit",
+    blurb:"The design, purpose and function of the family and of the church, with appendices on becoming a spiritual parent and a mature spiritual leader.",
+    groups:[{name:"", sessions:[
+      ses("p. 9","Design and Purpose of the Family","basics-book-3-engl-july-2026-pdf.pdf",["Managing one's household"]),
+      ses("p. 17","Function of the Family","basics-book-3-engl-july-2026-pdf.pdf",["Managing one's household"]),
+      ses("p. 22","Design and Purpose of the Church","basics-book-3-engl-july-2026-pdf.pdf",["The church","Overseeing"]),
+      ses("p. 29","Function of the Church","basics-book-3-engl-july-2026-pdf.pdf",["The church","Overseeing","Fellowship"]),
+      ses("App. 1","Practical Steps for Becoming a Spiritual Parent","basics-book-3-engl-july-2026-pdf.pdf",["Discipling"],"p. 40"),
+      ses("App. 2","Practical Steps for Becoming a Mature Spiritual Leader","basics-book-3-engl-july-2026-pdf.pdf",["Overseeing","A pacesetter"],"p. 43")
+    ]}]
+  },
+  {
+    id:"gcw", title:"Great Commission Workbook (2nd edition)",
+    by:"7 units + appendices",
+    approx:true,
+    blurb:"A comprehensive examination of the Great Commission: the foundation of revelation, what is on God’s heart, Jesus giving the commission, the examples of Paul and the early church, and principles of strategy.",
+    groups:[{name:"", sessions:[
+      ses("Unit 1","The Changeless Foundation of Revelation","GreatCommissionWorkbook2018.pdf",["Authority of Word of God"]),
+      ses("Unit 2","What Is on God’s Heart?","GreatCommissionWorkbook2018.pdf",["The Great Commission","Heart for God"]),
+      ses("Unit 3","Jesus Gives the Commission","GreatCommissionWorkbook2018.pdf",["The Great Commission"]),
+      ses("Unit 4","The Example of Paul, the Apostle","GreatCommissionWorkbook2018.pdf",["The Great Commission","Witnessing"]),
+      ses("Unit 5","The Example of the Early Church","GreatCommissionWorkbook2018.pdf",["The Great Commission","Discipling","The church"]),
+      ses("Unit 6","Principles of Strategy, Part 1","GreatCommissionWorkbook2018.pdf",["Vision to be used by God","Witnessing"]),
+      ses("Unit 7","Principles of Strategy, Part 2","GreatCommissionWorkbook2018.pdf",["Vision to be used by God","Discipling"])
+    ]}]
+  },
+  {
+    id:"lifenow", title:"Life Now Bible Exploration — Begin / Grow / Mature in Christ",
+    by:"3 booklets · English and German",
+    approx:true,
+    blurb:"Three booklets from Great Commission Churches that take a person from meeting Christ, through growing in fellowship and Christ-like living, to maturing, sharing the new life and multiplying. Available in German as Teil 1–3.",
+    groups:[{name:"", sessions:[
+      ses("1","Begin in Christ",{en:"www.begininchrist.com_BegininChrist_booklet.pdf", de:"Teil 1 Beginnen in Christus, Broschüre, Köln.pdf"},["Deity of Christ","Assurance of salvation","Eternal security","Baptism"]),
+      ses("2","Grow in Christ",{en:"www.begininchrist.com_grow_GrowInChrist.pdf", de:"Teil 2 Wachsen in Christus, Broschüre.pdf"},["Fellowship","Managing one's household"]),
+      ses("3","Mature in Christ",{en:"www.begininchrist.com_mature_MatureInChrist.pdf", de:"Teil 3 Reifen in Christus, Broschüre.pdf"},["Witnessing","Discipling","The Great Commission","Giving (tithing)","Serving","The church","Studying God's Word"])
+    ]}]
+  }
+];
+
+var ITEM_BY_TITLE = {};
+ITEMS.forEach(function(it){ ITEM_BY_TITLE[it.title] = it; });
+
+COURSES.forEach(function(c){
+  var by = {}, n = 0, withFile = 0;
+  c.groups.forEach(function(g){
+    g.sessions.forEach(function(s){
+      n++; if (s.f) withFile++;
+      s.items.forEach(function(title){ (by[title] = by[title] || []).push(s); });
+    });
+  });
+  (c.courseItems || []).forEach(function(title){ by[title] = by[title] || []; });
+  c.an = {by:by, n:n, withFile:withFile};
+});
+
+// ---- course-view state ----
+var VIEW_KEY = "discipling-pathway-view-v1";
+var MATLANG_KEY = "discipling-pathway-matlang-v1";
+var view = "pathway";
+var matLang = "auto";
+try {
+  var sv = localStorage.getItem(VIEW_KEY);
+  if (sv === "pathway" || sv === "courses") view = sv;
+  var sm = localStorage.getItem(MATLANG_KEY);
+  if (sm === "auto" || (sm && LANGS.indexOf(sm) !== -1)) matLang = sm;
+} catch(e) {}
+var filt = {stage:"all", div:"all", item:null};
+var openCourse = {};
+var openCell = {};
+
+function effMatLang(){ return matLang === "auto" ? currentLang : matLang; }
+
+function driveFileUrl(name){
+  return "https://drive.google.com/drive/search?q=" + encodeURIComponent(name);
+}
+function fileFor(s, L){
+  if (!s.f) return null;
+  if (s.f[L]) return {name:s.f[L], lang:L, fallback:false};
+  if (s.f.en) return {name:s.f.en, lang:"en", fallback:(L !== "en")};
+  return null;
+}
+function langStats(c){
+  var out = {};
+  LANGS.forEach(function(L){
+    var n = 0;
+    c.groups.forEach(function(g){ g.sessions.forEach(function(s){ if (s.f && s.f[L]) n++; }); });
+    out[L] = n;
+  });
+  return out;
+}
+function coursesCovering(title){
+  var list = [];
+  COURSES.forEach(function(c){
+    var ss = c.an.by[title];
+    if (ss) list.push({course:c, sessions:ss});
+  });
+  return list;
+}
+function ccButtonHtml(title){
+  var n = coursesCovering(title).length;
+  if (!n) return "";
+  return '<button type="button" class="cc-btn" data-item="'+escapeHtml(title)+'">' +
+    escapeHtml(fillTemplate(t("ccBtn"), {n:n})) + '</button>';
+}
+
+function applyCourseI18n(){
+  var a = document.getElementById("tabPathway"); if (a) a.textContent = t("tabPathway");
+  var b = document.getElementById("tabCourses"); if (b) b.textContent = t("tabCourses");
+}
+
+function courseMatch(c){
+  var by = c.an.by;
+  if (filt.item) return by[filt.item] ? {count:by[filt.item].length} : null;
+  var cnt = 0;
+  Object.keys(by).forEach(function(title){
+    var it = ITEM_BY_TITLE[title]; if (!it) return;
+    if ((filt.stage === "all" || it.stage === filt.stage) && (filt.div === "all" || it.division === filt.div)) cnt++;
+  });
+  return cnt > 0 ? {count:cnt} : null;
+}
+
+function gridHtml(c){
+  var by = c.an.by, sel = openCell[c.id];
+  var filtering = (filt.stage !== "all" || filt.div !== "all");
+  var h = '<table class="cov-grid"><thead><tr><th></th>' +
+    STAGES.map(function(s){ return '<th>'+escapeHtml(trStage(s.id))+'</th>'; }).join("") +
+    '</tr></thead><tbody>';
+  DIVISIONS.forEach(function(d){
+    h += '<tr><th class="cov-row" style="color:'+d.color+'">'+escapeHtml(trDivLabel(d.id))+'</th>';
+    STAGES.forEach(function(s){
+      var items = itemsFor(s.id, d.id);
+      var cov = items.filter(function(it){ return by[it.title]; }).length;
+      var f = items.length ? cov/items.length : 0;
+      var k = s.id + "|" + d.id;
+      var hl = filtering && (filt.stage === "all" || filt.stage === s.id) && (filt.div === "all" || filt.div === d.id);
+      h += '<td><button type="button" class="cov-cell'+(cov ? "" : " empty")+(sel === k ? " sel" : "")+(hl ? " hl" : "")+'"' +
+        ' style="--cell-color:'+d.color+';--f:'+f.toFixed(2)+'" data-act="cell" data-course="'+c.id+'" data-cell="'+k+'"' +
+        (cov ? "" : " disabled") + '><b>'+cov+'</b><span>/'+items.length+'</span></button></td>';
+    });
+    h += '</tr>';
+  });
+  return h + '</tbody></table>';
+}
+
+function sessLabels(c, title){
+  var ss = c.an.by[title] || [];
+  if (!ss.length) return escapeHtml(t("wholeCourse"));
+  return ss.map(function(s){ return escapeHtml(s.n); }).join(", ");
+}
+
+function cellDetailHtml(c){
+  var key = openCell[c.id];
+  if (!key) return "";
+  var p = key.split("|");
+  var items = itemsFor(p[0], p[1]);
+  var by = c.an.by;
+  var hit = items.filter(function(it){ return by[it.title]; });
+  var miss = items.filter(function(it){ return !by[it.title]; });
+  var h = '<div class="cell-detail"><div class="cell-detail-title">' +
+    escapeHtml(trStage(p[0])) + ' · ' + escapeHtml(trDivLabel(p[1])) + '</div><ul class="cell-list">';
+  hit.forEach(function(it){
+    var done = isChecked(it.id);
+    h += '<li class="'+(done ? "done" : "")+'"><span class="tick">'+(done ? "&#10003;" : "")+'</span>' +
+      '<span class="ct">'+escapeHtml(trTitle(it.title))+'</span> <span class="cov-sess">'+sessLabels(c, it.title)+'</span></li>';
+  });
+  h += '</ul>';
+  if (miss.length){
+    h += '<div class="cell-miss"><b>'+escapeHtml(t("notCoveredHere"))+'</b> ' +
+      miss.map(function(it){ return escapeHtml(trTitle(it.title)); }).join(" · ") + '</div>';
+  }
+  return h + '</div>';
+}
+
+function sessionsHtml(c, eff){
+  var only = filt.item;
+  var h = "";
+  c.groups.forEach(function(g){
+    var ss = g.sessions.filter(function(s){ return !only || s.items.indexOf(only) !== -1; });
+    if (!ss.length) return;
+    if (g.name) h += '<div class="sess-group">'+escapeHtml(g.name)+'</div>';
+    h += '<ul class="sess-list">';
+    ss.forEach(function(s){
+      var file = fileFor(s, eff);
+      var title = escapeHtml(s.title) + (s.pg ? ' <span class="pg">'+escapeHtml(s.pg)+'</span>' : "");
+      var body;
+      if (file){
+        body = '<a href="'+driveFileUrl(file.name)+'" target="_blank" rel="noopener noreferrer">'+title+'</a>' +
+          (file.fallback ? ' <span class="lang-badge">'+escapeHtml(LANG_NAMES[file.lang])+'</span>' : "");
+      } else {
+        body = '<span class="nofile">'+title+'</span> <span class="lang-badge off">'+escapeHtml(t("noFileYet"))+'</span>';
+      }
+      var covered = s.items.map(function(x){ return escapeHtml(trTitle(x)); }).join(" · ");
+      h += '<li class="sess'+(only && s.items.indexOf(only) !== -1 ? " hit" : "")+'">' +
+        '<span class="sn">'+escapeHtml(s.n)+'</span>' +
+        '<span class="sbody"><span class="st">'+body+'</span>' +
+        (covered ? '<span class="sitems">'+covered+'</span>' : "") + '</span></li>';
+    });
+    h += '</ul>';
+  });
+  return h;
+}
+
+function courseCardHtml(c, m, eff){
+  var by = c.an.by;
+  var stats = langStats(c);
+  var total = c.an.withFile;
+  var chips = LANGS.filter(function(L){ return stats[L] > 0; }).map(function(L){
+    var full = stats[L] === total;
+    return '<span class="lchip'+(full ? "" : " part")+(L === eff ? " eff" : "")+'">' +
+      '<span class="flag">'+LANG_FLAGS[L]+'</span> '+LANG_NAMES[L]+(full ? "" : ' '+stats[L]+'/'+total)+'</span>';
+  }).join("");
+  var warn = "";
+  if (eff !== "en"){
+    if (stats[eff] === 0) warn = fillTemplate(t("notInLang"), {lang:LANG_NAMES[eff]});
+    else if (stats[eff] < total) warn = fillTemplate(t("partInLang"), {lang:LANG_NAMES[eff], n:stats[eff], total:total});
+  }
+  var covered = Object.keys(by).filter(function(x){ return ITEM_BY_TITLE[x]; }).length;
+  var openN = ITEMS.filter(function(it){ return it.stage === currentStage && by[it.title] && !isChecked(it.id); }).length;
+  var isOpen = !!openCourse[c.id] || !!filt.item;
+  var sessLine = filt.item
+    ? fillTemplate(t("sessionsCount"), {n:m.count})
+    : fillTemplate(t("sessionsCount"), {n:c.an.n});
+  var h = '<article class="course-card" id="course-'+c.id+'">' +
+    '<div class="course-head"><div class="course-id"><h3>'+escapeHtml(c.title)+'</h3>' +
+    '<div class="course-by">'+escapeHtml(c.by)+(c.approx ? ' · <span class="lang-badge off">'+escapeHtml(t("approxBadge"))+'</span>' : "")+'</div></div>' +
+    '<div class="course-langs" title="'+escapeHtml(t("availIn"))+'"><span class="avail">'+escapeHtml(t("availIn"))+'</span>'+chips+'</div></div>' +
+    (warn ? '<div class="lang-warn">'+escapeHtml(warn)+'</div>' : "") +
+    '<p class="course-blurb">'+escapeHtml(c.blurb)+'</p>' +
+    '<div class="cov-wrap">'+gridHtml(c)+'</div>' +
+    '<div class="cov-summary"><b>'+escapeHtml(fillTemplate(t("coversTotal"), {c:covered, t:ITEMS.length}))+'</b>' +
+    (openN ? ' · '+escapeHtml(fillTemplate(t("coversOpen"), {n:openN, stage:trStage(currentStage)})) : "") + '</div>' +
+    cellDetailHtml(c) +
+    '<button type="button" class="sess-toggle" data-act="toggle" data-course="'+c.id+'" aria-expanded="'+(isOpen ? "true" : "false")+'">' +
+    '<span class="caret">&#9656;</span> '+escapeHtml(isOpen ? t("hideSessions") : t("showSessions"))+' &middot; '+escapeHtml(sessLine)+'</button>' +
+    (isOpen ? '<div class="sess-wrap">'+sessionsHtml(c, eff)+'</div>' : "") +
+    '</article>';
+  return h;
+}
+
+function renderCourses(){
+  var host = document.getElementById("coursesView");
+  if (!host) return;
+  var eff = effMatLang();
+  var h = '<div class="section-title">'+escapeHtml(t("coursesTitle"))+'</div>' +
+    '<p class="overview-hint">'+escapeHtml(t("coursesHint"))+'</p>';
+
+  h += '<div class="course-controls">';
+  if (filt.item){
+    h += '<div class="item-banner"><span>'+escapeHtml(fillTemplate(t("coursesCovering"), {item:trTitle(filt.item)}))+'</span>' +
+      '<button type="button" class="fchip" data-act="clear-item">'+escapeHtml(t("clearFilter"))+' &times;</button></div>';
+  } else {
+    h += '<div class="frow"><span class="flabel">'+escapeHtml(t("fStage"))+'</span>' +
+      '<button type="button" class="fchip'+(filt.stage === "all" ? " active" : "")+'" data-act="fstage" data-v="all">'+escapeHtml(t("fAll"))+'</button>' +
+      STAGES.map(function(s){
+        return '<button type="button" class="fchip'+(filt.stage === s.id ? " active" : "")+'" data-act="fstage" data-v="'+s.id+'">'+escapeHtml(trStage(s.id))+'</button>';
+      }).join("") + '</div>';
+    h += '<div class="frow"><span class="flabel">'+escapeHtml(t("fArea"))+'</span>' +
+      '<button type="button" class="fchip'+(filt.div === "all" ? " active" : "")+'" data-act="fdiv" data-v="all">'+escapeHtml(t("fAll"))+'</button>' +
+      DIVISIONS.map(function(d){
+        return '<button type="button" class="fchip'+(filt.div === d.id ? " active" : "")+'" data-act="fdiv" data-v="'+d.id+'">'+escapeHtml(trDivLabel(d.id))+'</button>';
+      }).join("") + '</div>';
+  }
+  h += '<div class="frow"><label class="flabel" for="matLangSel">'+escapeHtml(t("matLangLabel"))+'</label>' +
+    '<select id="matLangSel" class="msel"><option value="auto"'+(matLang === "auto" ? " selected" : "")+'>'+escapeHtml(t("matLangAuto"))+'</option>' +
+    LANGS.map(function(L){ return '<option value="'+L+'"'+(matLang === L ? " selected" : "")+'>'+LANG_NAMES[L]+'</option>'; }).join("") +
+    '</select></div>';
+  h += '</div>';
+
+  var rows = [];
+  COURSES.forEach(function(c, i){
+    var m = courseMatch(c);
+    if (m) rows.push({c:c, m:m, i:i});
+  });
+  var filtering = filt.item || filt.stage !== "all" || filt.div !== "all";
+  if (filtering) rows.sort(function(a, b){ return (b.m.count - a.m.count) || (a.i - b.i); });
+
+  if (!rows.length){
+    h += '<div class="no-courses">'+escapeHtml(t("noCourses"))+'</div>';
+  } else {
+    h += '<div class="course-list">' + rows.map(function(r){ return courseCardHtml(r.c, r.m, eff); }).join("") + '</div>';
+  }
+  host.innerHTML = h;
+}
+
+(function initCoursesEvents(){
+  var host = document.getElementById("coursesView");
+  if (host){
+    host.addEventListener("click", function(e){
+      var el = e.target.closest("[data-act]");
+      if (!el || !host.contains(el)) return;
+      var act = el.getAttribute("data-act");
+      if (act === "toggle"){
+        var id = el.getAttribute("data-course");
+        openCourse[id] = !openCourse[id];
+      } else if (act === "cell"){
+        var cid = el.getAttribute("data-course"), cell = el.getAttribute("data-cell");
+        openCell[cid] = (openCell[cid] === cell) ? null : cell;
+      } else if (act === "fstage"){ filt.stage = el.getAttribute("data-v");
+      } else if (act === "fdiv"){ filt.div = el.getAttribute("data-v");
+      } else if (act === "clear-item"){ filt.item = null;
+      } else { return; }
+      renderCourses();
+    });
+    host.addEventListener("change", function(e){
+      if (e.target && e.target.id === "matLangSel"){
+        matLang = e.target.value;
+        try { localStorage.setItem(MATLANG_KEY, matLang); } catch(err) {}
+        renderCourses();
+      }
+    });
+  }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest ? e.target.closest(".cc-btn") : null;
+    if (!b) return;
+    filt.item = b.getAttribute("data-item");
+    filt.stage = "all"; filt.div = "all";
+    setView("courses");
+    var tabsEl = document.getElementById("viewTabs");
+    if (tabsEl && tabsEl.scrollIntoView) tabsEl.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+  var tabsNav = document.getElementById("viewTabs");
+  if (tabsNav){
+    tabsNav.addEventListener("click", function(e){
+      var b = e.target.closest("[data-view]");
+      if (!b) return;
+      if (b.getAttribute("data-view") !== "courses") filt.item = null;
+      setView(b.getAttribute("data-view"));
+    });
+  }
+})();
+
+function setView(v){
+  view = v;
+  try { localStorage.setItem(VIEW_KEY, v); } catch(e) {}
+  renderAll();
+}
+function renderViews(){
+  var p = document.getElementById("viewPathway"), c = document.getElementById("coursesView");
+  if (p) p.hidden = (view !== "pathway");
+  if (c) c.hidden = (view !== "courses");
+  document.querySelectorAll("#viewTabs [data-view]").forEach(function(b){
+    var on = b.getAttribute("data-view") === view;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-selected", on ? "true" : "false");
+  });
+}
+
+// ===========================================================================
+// "SHOW ME AROUND" TOUR
+// A spotlight + popover walk-through of the page. Steps whose target does not
+// exist (e.g. no course covers the first next-step) are skipped automatically.
+// ===========================================================================
+var TOUR_UI = {
+  tourBtn: {en:"Show me around", uk:"Покажи, що тут є", de:"Rundgang starten", es:"Muéstrame la página", it:"Fammi fare un giro", pl:"Pokaż mi, co tu jest", fa:"راهنمای صفحه"},
+  tourHint: {en:"New here? Take the tour", uk:"Ти тут уперше? Подивись, що де", de:"Neu hier? Mach den Rundgang", es:"¿Eres nuevo? Haz el recorrido", it:"Sei nuovo? Fai il giro", pl:"Pierwszy raz? Obejrzyj przewodnik", fa:"اولین بار است؟ راهنما را ببین"},
+  tourNext: {en:"Next", uk:"Далі", de:"Weiter", es:"Siguiente", it:"Avanti", pl:"Dalej", fa:"بعدی"},
+  tourBack: {en:"Back", uk:"Назад", de:"Zurück", es:"Atrás", it:"Indietro", pl:"Wstecz", fa:"قبلی"},
+  tourSkip: {en:"Skip tour", uk:"Пропустити", de:"Überspringen", es:"Omitir", it:"Salta", pl:"Pomiń", fa:"رد کردن"},
+  tourDone: {en:"Done", uk:"Готово", de:"Fertig", es:"Listo", it:"Fine", pl:"Gotowe", fa:"پایان"},
+  tourOf: {en:"{n} of {total}", uk:"{n} з {total}", de:"{n} von {total}", es:"{n} de {total}", it:"{n} di {total}", pl:"{n} z {total}", fa:"{n} از {total}"},
+  tourClose: {en:"Close", uk:"Закрити", de:"Schließen", es:"Cerrar", it:"Chiudi", pl:"Zamknij", fa:"بستن"}
+};
+Object.keys(TOUR_UI).forEach(function(k){ UI_STRINGS[k] = TOUR_UI[k]; });
+
+var TOUR_TXT = {
+  welcome: {
+    title: {en:"Welcome to iDisciple", uk:"Ласкаво просимо до iDisciple", de:"Willkommen bei iDisciple", es:"Bienvenido a iDisciple", it:"Benvenuto in iDisciple", pl:"Witaj w iDisciple", fa:"به iDisciple خوش آمدی"},
+    text: {
+      en:"iDisciple maps spiritual growth in four stages and three areas, then points to the next step and the material for it. This short tour shows what is on the page. Use the buttons or the arrow keys; Esc closes it.",
+      uk:"iDisciple показує духовне зростання у чотирьох етапах і трьох сферах, а потім вказує наступний крок і матеріали до нього. Ця коротка екскурсія покаже, що є на сторінці. Користуйся кнопками або стрілками на клавіатурі; Esc закриває її.",
+      de:"iDisciple zeigt geistliches Wachstum in vier Stufen und drei Bereichen und weist dann auf den nächsten Schritt samt Material hin. Dieser kurze Rundgang zeigt, was auf der Seite zu sehen ist. Nutze die Schaltflächen oder die Pfeiltasten; mit Esc schließt du ihn.",
+      es:"iDisciple muestra el crecimiento espiritual en cuatro etapas y tres áreas, y luego señala el próximo paso y el material para darlo. Este breve recorrido te enseña lo que hay en la página. Usa los botones o las flechas del teclado; Esc lo cierra.",
+      it:"iDisciple mappa la crescita spirituale in quattro fasi e tre aree, poi indica il prossimo passo e il materiale per affrontarlo. Questo breve giro mostra cosa c’è nella pagina. Usa i pulsanti o le frecce della tastiera; Esc lo chiude.",
+      pl:"iDisciple pokazuje duchowy wzrost w czterech etapach i trzech obszarach, a następnie wskazuje kolejny krok i materiały do niego. Ten krótki przewodnik pokazuje, co jest na stronie. Używaj przycisków lub strzałek; Esc go zamyka.",
+      fa:"iDisciple رشد روحانی را در چهار مرحله و سه حوزه نشان می‌دهد و سپس قدم بعدی و مطالب مربوط به آن را معرفی می‌کند. این راهنمای کوتاه نشان می‌دهد در صفحه چه چیزهایی هست. از دکمه‌ها یا کلیدهای جهت‌نما استفاده کن؛ Esc آن را می‌بندد."
+    }
+  },
+  lang: {
+    title: {en:"Language buttons", uk:"Кнопки мов", de:"Sprachschaltflächen", es:"Botones de idioma", it:"Pulsanti della lingua", pl:"Przyciski języków", fa:"دکمه‌های زبان"},
+    text: {
+      en:"Switch the whole page between English, Ukrainian, German, Spanish, Italian, Polish and Farsi (which reads right-to-left). Lesson and file names stay in English because they match the real files.",
+      uk:"Перемикай усю сторінку між англійською, українською, німецькою, іспанською, італійською, польською та фарсі (читається справа наліво). Назви уроків і файлів залишаються англійською, бо збігаються з реальними файлами.",
+      de:"Schalte die ganze Seite zwischen Englisch, Ukrainisch, Deutsch, Spanisch, Italienisch, Polnisch und Farsi (wird von rechts nach links gelesen) um. Lektions- und Dateinamen bleiben englisch, weil sie zu den echten Dateien passen.",
+      es:"Cambia toda la página entre inglés, ucraniano, alemán, español, italiano, polaco y farsi (que se lee de derecha a izquierda). Los nombres de lecciones y archivos siguen en inglés porque coinciden con los archivos reales.",
+      it:"Cambia l’intera pagina tra inglese, ucraino, tedesco, spagnolo, italiano, polacco e farsi (che si legge da destra a sinistra). I nomi delle lezioni e dei file restano in inglese perché corrispondono ai file reali.",
+      pl:"Przełączaj całą stronę między angielskim, ukraińskim, niemieckim, hiszpańskim, włoskim, polskim i perskim (czytanym od prawej do lewej). Nazwy lekcji i plików pozostają po angielsku, bo odpowiadają prawdziwym plikom.",
+      fa:"کل صفحه را بین انگلیسی، اوکراینی، آلمانی، اسپانیایی، ایتالیایی، لهستانی و فارسی (که از راست به چپ خوانده می‌شود) عوض کن. نام درس‌ها و فایل‌ها به انگلیسی می‌ماند چون با فایل‌های واقعی یکی است."
+    }
+  },
+  tabs: {
+    title: {en:"Pathway and Courses", uk:"Шлях і Курси", de:"Weg und Kurse", es:"Camino y Cursos", it:"Percorso e Corsi", pl:"Ścieżka i Kursy", fa:"مسیر و دوره‌ها"},
+    text: {
+      en:"Pathway is the growth chart with your next steps. Courses is a library of whole studies to go through with someone, showing which areas of the chart each one covers.",
+      uk:"«Шлях» — це схема зростання з твоїми наступними кроками. «Курси» — бібліотека цілих студій, які можна пройти з кимось; вона показує, які сфери схеми охоплює кожна.",
+      de:"„Weg“ ist das Wachstumsschema mit deinen nächsten Schritten. „Kurse“ ist eine Bibliothek ganzer Studien zum gemeinsamen Durcharbeiten und zeigt, welche Bereiche des Schemas jede abdeckt.",
+      es:"«Camino» es el cuadro de crecimiento con tus próximos pasos. «Cursos» es una biblioteca de estudios completos para recorrer con alguien, que muestra qué áreas del cuadro cubre cada uno.",
+      it:"«Percorso» è lo schema di crescita con i tuoi prossimi passi. «Corsi» è una biblioteca di studi completi da fare insieme a qualcuno e mostra quali aree dello schema copre ciascuno.",
+      pl:"„Ścieżka” to schemat wzrostu z twoimi kolejnymi krokami. „Kursy” to biblioteka całych studiów do przejścia z kimś; pokazuje, które obszary schematu obejmuje każdy z nich.",
+      fa:"«مسیر» نمودار رشد همراه با قدم‌های بعدی توست. «دوره‌ها» کتابخانه‌ای از مطالعات کامل برای گذراندن همراه با دیگری است و نشان می‌دهد هر کدام کدام حوزه‌های نمودار را پوشش می‌دهد."
+    }
+  },
+  record: {
+    title: {en:"Session Record", uk:"Протокол зустрічі", de:"Sitzungsprotokoll", es:"Registro de la Sesión", it:"Scheda dell’Incontro", pl:"Protokół spotkania", fa:"گزارش جلسه"},
+    text: {
+      en:"Use it in a discipling meeting: note the disciple, the discipler, the date, the agreed next steps and when they should be done. It saves automatically in this browser.",
+      uk:"Використовуй її під час зустрічі наставництва: запиши учня, наставника, дату, узгоджені кроки та термін їх виконання. Вона зберігається автоматично в цьому браузері.",
+      de:"Nutze es in einem Jüngerschaftsgespräch: Jünger, Mentor, Datum, vereinbarte nächste Schritte und Fertigstellungstermin eintragen. Es wird automatisch in diesem Browser gespeichert.",
+      es:"Úsalo en una reunión de discipulado: anota al discípulo, al discipulador, la fecha, los próximos pasos acordados y cuándo deben cumplirse. Se guarda automáticamente en este navegador.",
+      it:"Usala in un incontro di discepolato: annota discepolo, mentore, data, prossimi passi concordati e entro quando completarli. Si salva automaticamente in questo browser.",
+      pl:"Użyj jej na spotkaniu uczniowskim: zapisz ucznia, mentora, datę, uzgodnione kroki i termin ich wykonania. Zapisuje się automatycznie w tej przeglądarce.",
+      fa:"در یک جلسه‌ی شاگردسازی از آن استفاده کن: شاگرد، شاگردساز، تاریخ، قدم‌های توافق‌شده و مهلت انجام آن‌ها را بنویس. به‌طور خودکار در همین مرورگر ذخیره می‌شود."
+    }
+  },
+  pdf: {
+    title: {en:"Download PDF", uk:"Завантажити PDF", de:"PDF herunterladen", es:"Descargar PDF", it:"Scarica PDF", pl:"Pobierz PDF", fa:"دانلود PDF"},
+    text: {
+      en:"Saves the page, with your record and ticks, as a PDF you can send or print. Because progress is stored only in this browser, the PDF is the way to share where you are.",
+      uk:"Зберігає сторінку разом із записом і позначками як PDF, який можна надіслати або роздрукувати. Оскільки прогрес зберігається лише в цьому браузері, PDF — це спосіб поділитися тим, на якому ти етапі.",
+      de:"Speichert die Seite samt Protokoll und Häkchen als PDF zum Versenden oder Drucken. Da der Fortschritt nur in diesem Browser liegt, ist das PDF der Weg, den aktuellen Stand zu teilen.",
+      es:"Guarda la página, con tu registro y tus marcas, como un PDF que puedes enviar o imprimir. Como el progreso solo se guarda en este navegador, el PDF es la forma de compartir cómo vas.",
+      it:"Salva la pagina, con la scheda e le spunte, come PDF da inviare o stampare. Poiché i progressi restano solo in questo browser, il PDF è il modo per condividere a che punto sei.",
+      pl:"Zapisuje stronę wraz z protokołem i zaznaczeniami jako PDF, który możesz wysłać lub wydrukować. Ponieważ postęp jest zapisany tylko w tej przeglądarce, PDF to sposób, by pokazać, na jakim jesteś etapie.",
+      fa:"صفحه را همراه با گزارش و علامت‌ها به‌صورت PDF ذخیره می‌کند تا بفرستی یا چاپ کنی. چون پیشرفت فقط در همین مرورگر نگه داشته می‌شود، PDF راه به‌اشتراک‌گذاشتن وضعیت توست."
+    }
+  },
+  overview: {
+    title: {en:"Full Chart Overview", uk:"Повний огляд схеми", de:"Gesamtübersicht", es:"Resumen completo del cuadro", it:"Panoramica completa dello schema", pl:"Pełny przegląd schematu", fa:"نمای کلی کامل نمودار"},
+    text: {
+      en:"The whole pathway at a glance: four stages across (New Born, Disciple, Worker, Leader) and three areas down the side — Knowing (doctrine), Doing (conduct) and Being (character). Tick what is already true; click a stage name to jump into it.",
+      uk:"Увесь шлях одним поглядом: чотири етапи зверху (Новонароджений, Учень, Працівник, Лідер) і три сфери збоку — Знання (вчення), Дії (поведінка) та Буття (характер). Познач те, що вже є правдою; натисни на назву етапу, щоб перейти до нього.",
+      de:"Der ganze Weg auf einen Blick: vier Stufen oben (Neugeboren, Jünger, Mitarbeiter, Leiter) und drei Bereiche an der Seite — Wissen (Lehre), Handeln (Wandel) und Sein (Charakter). Hake ab, was schon zutrifft; klicke auf eine Stufe, um dorthin zu springen.",
+      es:"Todo el camino de un vistazo: cuatro etapas arriba (Recién Nacido, Discípulo, Obrero, Líder) y tres áreas a un lado — Saber (doctrina), Hacer (conducta) y Ser (carácter). Marca lo que ya es cierto; haz clic en una etapa para ir a ella.",
+      it:"L’intero percorso a colpo d’occhio: quattro fasi in alto (Neonato, Discepolo, Collaboratore, Leader) e tre aree a lato — Sapere (dottrina), Fare (condotta) ed Essere (carattere). Spunta ciò che è già vero; clicca su una fase per passare a essa.",
+      pl:"Cała ścieżka na pierwszy rzut oka: cztery etapy u góry (Nowo narodzony, Uczeń, Pracownik, Lider) i trzy obszary z boku — Wiedza (doktryna), Działanie (postępowanie) i Bycie (charakter). Zaznacz, co jest już prawdą; kliknij etap, aby do niego przejść.",
+      fa:"کل مسیر در یک نگاه: چهار مرحله در بالا (نوزاد، شاگرد، خادم، رهبر) و سه حوزه در کنار — شناخت (تعلیم)، عمل (رفتار) و بودن (شخصیت). آنچه از قبل صادق است را علامت بزن؛ روی نام مرحله کلیک کن تا به آن بروی."
+    }
+  },
+  stagebar: {
+    title: {en:"Stage bar", uk:"Панель етапів", de:"Stufenleiste", es:"Barra de etapas", it:"Barra delle fasi", pl:"Pasek etapów", fa:"نوار مراحل"},
+    text: {
+      en:"Pick the stage you are working in. The ring shows how much of that stage is ticked.",
+      uk:"Обери етап, у якому працюєш. Кільце показує, яка частина етапу вже позначена.",
+      de:"Wähle die Stufe, an der du arbeitest. Der Ring zeigt, wie viel davon abgehakt ist.",
+      es:"Elige la etapa en la que trabajas. El anillo muestra cuánto de esa etapa está marcado.",
+      it:"Scegli la fase su cui stai lavorando. L’anello mostra quanto di quella fase è già spuntato.",
+      pl:"Wybierz etap, nad którym pracujesz. Pierścień pokazuje, jaka część etapu jest zaznaczona.",
+      fa:"مرحله‌ای را که رویش کار می‌کنی انتخاب کن. حلقه نشان می‌دهد چه مقدار از آن مرحله علامت خورده است."
+    }
+  },
+  next: {
+    title: {en:"Your next steps", uk:"Твої наступні кроки", de:"Deine nächsten Schritte", es:"Tus próximos pasos", it:"I tuoi prossimi passi", pl:"Twoje kolejne kroki", fa:"قدم‌های بعدی تو"},
+    text: {
+      en:"For each area, the first item not yet ticked in this stage shows up as a card with resources. Tick “Mark this one done” and the next one takes its place.",
+      uk:"Для кожної сфери перший ще не позначений пункт цього етапу з’являється як картка з матеріалами. Познач «Позначити як виконано» — і його місце займе наступний.",
+      de:"Für jeden Bereich erscheint der erste noch nicht abgehakte Punkt dieser Stufe als Karte mit Material. Hake „Als erledigt markieren“ an, und der nächste rückt nach.",
+      es:"Para cada área, el primer elemento sin marcar de esta etapa aparece como una tarjeta con recursos. Marca «Marcar como hecho» y el siguiente ocupa su lugar.",
+      it:"Per ogni area, la prima voce non ancora spuntata di questa fase compare come scheda con le risorse. Spunta «Segna come fatto» e subentra la successiva.",
+      pl:"Dla każdego obszaru pierwsza jeszcze niezaznaczona pozycja tego etapu pojawia się jako karta z materiałami. Zaznacz „Oznacz jako wykonane”, a jej miejsce zajmie następna.",
+      fa:"برای هر حوزه، نخستین مورد علامت‌نخورده‌ی این مرحله به‌صورت کارتی همراه با منابع نمایان می‌شود. «این مورد را انجام‌شده علامت بزن» را بزن تا مورد بعدی جای آن را بگیرد."
+    }
+  },
+  res: {
+    title: {en:"Resource links", uk:"Посилання на матеріали", de:"Links zu den Materialien", es:"Enlaces a los recursos", it:"Link alle risorse", pl:"Linki do materiałów", fa:"پیوند منابع"},
+    text: {
+      en:"A Bible reference opens Bible Gateway. A named lesson or book opens a Google Drive search for the file, so you need to be signed in to the Google account that holds the folder.",
+      uk:"Біблійне посилання відкриває Bible Gateway. Назва уроку чи книги відкриває пошук файлу в Google Drive, тож потрібно бути увійшовшим в обліковий запис Google, де лежить папка.",
+      de:"Eine Bibelstelle öffnet Bible Gateway. Eine benannte Lektion oder ein Buch öffnet eine Google-Drive-Suche nach der Datei; du musst also in dem Google-Konto angemeldet sein, in dem der Ordner liegt.",
+      es:"Una referencia bíblica abre Bible Gateway. Una lección o libro con nombre abre una búsqueda en Google Drive del archivo, así que debes haber iniciado sesión en la cuenta de Google que tiene la carpeta.",
+      it:"Un riferimento biblico apre Bible Gateway. Una lezione o un libro con nome apre una ricerca del file su Google Drive, quindi devi aver effettuato l’accesso all’account Google che contiene la cartella.",
+      pl:"Odniesienie biblijne otwiera Bible Gateway. Nazwana lekcja lub książka otwiera wyszukiwanie pliku w Google Drive, więc musisz być zalogowany na konto Google, na którym jest folder.",
+      fa:"یک ارجاع کتاب‌مقدسی Bible Gateway را باز می‌کند. نام یک درس یا کتاب، جست‌وجوی آن فایل را در Google Drive باز می‌کند، پس باید به حساب Googleی وارد شده باشی که پوشه در آن است."
+    }
+  },
+  cc: {
+    title: {en:"Courses covering this", uk:"Курси, що це охоплюють", de:"Kurse dazu", es:"Cursos que lo cubren", it:"Corsi che lo coprono", pl:"Kursy na ten temat", fa:"دوره‌های مرتبط"},
+    text: {
+      en:"When courses cover an item, this link jumps to the Courses view filtered to that item, with the matching sessions highlighted.",
+      uk:"Коли курси охоплюють пункт, це посилання веде до перегляду «Курси», відфільтрованого за цим пунктом, із виділеними відповідними сесіями.",
+      de:"Wenn Kurse einen Punkt abdecken, springt dieser Link zur Kursansicht, gefiltert auf diesen Punkt, mit hervorgehobenen passenden Einheiten.",
+      es:"Cuando hay cursos que cubren un elemento, este enlace salta a la vista de Cursos filtrada por ese elemento, con las sesiones correspondientes resaltadas.",
+      it:"Quando dei corsi coprono una voce, questo link porta alla vista Corsi filtrata su quella voce, con gli incontri corrispondenti evidenziati.",
+      pl:"Gdy kursy obejmują daną pozycję, ten link przenosi do widoku Kursów przefiltrowanego do tej pozycji, z wyróżnionymi pasującymi spotkaniami.",
+      fa:"وقتی دوره‌هایی یک مورد را پوشش می‌دهند، این پیوند به نمای دوره‌ها می‌رود که بر اساس همان مورد فیلتر شده و جلسات مرتبط در آن مشخص شده‌اند."
+    }
+  },
+  items: {
+    title: {en:"Every item in the stage", uk:"Усі пункти етапу", de:"Alle Punkte der Stufe", es:"Todos los elementos de la etapa", it:"Tutte le voci della fase", pl:"Wszystkie pozycje etapu", fa:"همه‌ی موارد مرحله"},
+    text: {
+      en:"Everything in the stage is listed here. Click a title to see its resources, or tick the box when it is already true of the person.",
+      uk:"Тут перелічено все, що є на етапі. Натисни на назву, щоб побачити матеріали, або познач поле, якщо це вже стосується людини.",
+      de:"Hier ist alles dieser Stufe aufgelistet. Klicke auf einen Titel, um das Material zu sehen, oder hake ihn ab, wenn es bei der Person schon zutrifft.",
+      es:"Aquí se enumera todo lo de la etapa. Haz clic en un título para ver sus recursos, o marca la casilla si ya es cierto en la persona.",
+      it:"Qui è elencato tutto ciò che riguarda la fase. Clicca su un titolo per vedere le risorse, oppure spunta la casella se è già vero della persona.",
+      pl:"Tutaj wymieniono wszystko z danego etapu. Kliknij tytuł, aby zobaczyć materiały, lub zaznacz pole, gdy dana rzecz jest już prawdą o osobie.",
+      fa:"همه‌ی موارد مرحله در اینجا فهرست شده است. روی عنوان کلیک کن تا منابعش را ببینی، یا اگر درباره‌ی آن شخص از قبل صادق است، خانه را علامت بزن."
+    }
+  },
+  courses: {
+    title: {en:"Course filters", uk:"Фільтри курсів", de:"Kursfilter", es:"Filtros de cursos", it:"Filtri dei corsi", pl:"Filtry kursów", fa:"فیلتر دوره‌ها"},
+    text: {
+      en:"Filter the library by stage or area to find courses that cover what you need; the best matches come first.",
+      uk:"Фільтруй бібліотеку за етапом чи сферою, щоб знайти курси, які охоплюють потрібне; найкращі збіги йдуть першими.",
+      de:"Filtere die Bibliothek nach Stufe oder Bereich, um Kurse zu finden, die abdecken, was du brauchst; die besten Treffer stehen oben.",
+      es:"Filtra la biblioteca por etapa o área para encontrar cursos que cubran lo que necesitas; las mejores coincidencias van primero.",
+      it:"Filtra la biblioteca per fase o area per trovare i corsi che coprono ciò che ti serve; le corrispondenze migliori compaiono per prime.",
+      pl:"Filtruj bibliotekę według etapu lub obszaru, aby znaleźć kursy obejmujące to, czego potrzebujesz; najlepsze dopasowania są na początku.",
+      fa:"کتابخانه را بر اساس مرحله یا حوزه فیلتر کن تا دوره‌هایی را که نیازت را پوشش می‌دهند پیدا کنی؛ مناسب‌ترین‌ها اول می‌آیند."
+    }
+  },
+  grid: {
+    title: {en:"Chart coverage", uk:"Охоплення схеми", de:"Abdeckung des Schemas", es:"Cobertura del cuadro", it:"Copertura dello schema", pl:"Pokrycie schematu", fa:"پوشش نمودار"},
+    text: {
+      en:"Each card shows how much of the chart a course covers: darker cells mean more of that cell’s items. Click a cell to see which items and which sessions; “Show sessions” lists the files.",
+      uk:"Кожна картка показує, яку частину схеми охоплює курс: темніші клітинки — більше пунктів. Натисни на клітинку, щоб побачити пункти й сесії; «Показати сесії» відкриває список файлів.",
+      de:"Jede Karte zeigt, wie viel vom Schema ein Kurs abdeckt: dunklere Felder bedeuten mehr Punkte. Klicke auf ein Feld, um Punkte und Einheiten zu sehen; „Einheiten anzeigen“ listet die Dateien.",
+      es:"Cada tarjeta muestra cuánto del cuadro cubre un curso: las casillas más oscuras indican más elementos. Haz clic en una casilla para ver cuáles y en qué sesiones; «Mostrar sesiones» lista los archivos.",
+      it:"Ogni scheda mostra quanto dello schema copre un corso: le caselle più scure indicano più voci. Clicca su una casella per vedere quali e in quali incontri; «Mostra gli incontri» elenca i file.",
+      pl:"Każda karta pokazuje, ile ze schematu obejmuje kurs: ciemniejsze pola oznaczają więcej pozycji. Kliknij pole, aby zobaczyć pozycje i spotkania; „Pokaż spotkania” wyświetla pliki.",
+      fa:"هر کارت نشان می‌دهد دوره چه مقدار از نمودار را پوشش می‌دهد: خانه‌های تیره‌تر یعنی موارد بیشتر. روی یک خانه کلیک کن تا موارد و جلسات را ببینی؛ «نمایش جلسات» فایل‌ها را فهرست می‌کند."
+    }
+  },
+  matlang: {
+    title: {en:"Material language", uk:"Мова матеріалів", de:"Sprache der Materialien", es:"Idioma del material", it:"Lingua del materiale", pl:"Język materiałów", fa:"زبان مطالب"},
+    text: {
+      en:"Choose the language of the lesson files. It follows the page language unless you pick another. The language chips show where translations exist; otherwise the English file is used and marked.",
+      uk:"Обери мову файлів уроків. Вона збігається з мовою сторінки, якщо не вибрати іншу. Позначки мов показують, де є переклади; інакше використовується англійський файл із відповідною позначкою.",
+      de:"Wähle die Sprache der Lektionsdateien. Sie folgt der Seitensprache, solange du keine andere wählst. Die Sprachmarken zeigen, wo Übersetzungen existieren; sonst wird die englische Datei verwendet und gekennzeichnet.",
+      es:"Elige el idioma de los archivos de las lecciones. Sigue el idioma de la página salvo que elijas otro. Las etiquetas de idioma muestran dónde hay traducciones; si no, se usa el archivo en inglés y se marca.",
+      it:"Scegli la lingua dei file delle lezioni. Segue la lingua della pagina, a meno che tu ne scelga un’altra. Le etichette mostrano dove esistono traduzioni; altrimenti si usa il file inglese, segnalato.",
+      pl:"Wybierz język plików lekcji. Domyślnie jest to język strony, chyba że wybierzesz inny. Znaczniki języków pokazują, gdzie są tłumaczenia; w innym razie używany jest plik angielski i jest to oznaczone.",
+      fa:"زبان فایل‌های درس‌ها را انتخاب کن. اگر زبان دیگری انتخاب نکنی، همان زبان صفحه است. برچسب‌های زبان نشان می‌دهند ترجمه کجا هست؛ در غیر این صورت فایل انگلیسی استفاده و علامت‌گذاری می‌شود."
+    }
+  },
+  data: {
+    title: {en:"Your progress stays here", uk:"Твій прогрес зберігається тут", de:"Dein Fortschritt bleibt hier", es:"Tu progreso se queda aquí", it:"I tuoi progressi restano qui", pl:"Twój postęp zostaje tutaj", fa:"پیشرفت تو همین‌جا می‌ماند"},
+    text: {
+      en:"Ticks and the session record are saved only in this browser, not synced between devices or people. Use Download PDF to share where you are.",
+      uk:"Позначки та протокол зустрічі зберігаються лише в цьому браузері й не синхронізуються між пристроями чи людьми. Скористайся «Завантажити PDF», щоб поділитися своїм станом.",
+      de:"Häkchen und Sitzungsprotokoll werden nur in diesem Browser gespeichert und nicht zwischen Geräten oder Personen synchronisiert. Mit „PDF herunterladen“ teilst du deinen Stand.",
+      es:"Las marcas y el registro de la sesión se guardan solo en este navegador y no se sincronizan entre dispositivos ni personas. Usa «Descargar PDF» para compartir cómo vas.",
+      it:"Le spunte e la scheda dell’incontro sono salvate solo in questo browser e non vengono sincronizzate tra dispositivi o persone. Usa «Scarica PDF» per condividere a che punto sei.",
+      pl:"Zaznaczenia i protokół spotkania są zapisywane tylko w tej przeglądarce i nie synchronizują się między urządzeniami ani osobami. Użyj „Pobierz PDF”, aby pokazać, na jakim jesteś etapie.",
+      fa:"علامت‌ها و گزارش جلسه فقط در همین مرورگر ذخیره می‌شوند و بین دستگاه‌ها یا افراد همگام نمی‌شوند. برای به‌اشتراک‌گذاشتن وضعیتت از «دانلود PDF» استفاده کن."
+    }
+  },
+  flow: {
+    title: {en:"A typical meeting", uk:"Типова зустріч", de:"Ein typisches Treffen", es:"Una reunión típica", it:"Un incontro tipico", pl:"Typowe spotkanie", fa:"یک جلسه‌ی معمولی"},
+    text: {
+      en:"Open Pathway and tick what is already true.\nRead the next steps — or look in Courses for a whole study to go through together.\nAgree on the steps and write them in the Session Record with a date.\nDownload the PDF and share it.\nNext time, come back and tick what was done.",
+      uk:"Відкрий «Шлях» і познач те, що вже є правдою.\nПрочитай наступні кроки — або знайди в «Курсах» цілу студію, яку можна пройти разом.\nУзгодьте кроки й запишіть їх у протоколі зустрічі з датою.\nЗавантажте PDF і поділіться ним.\nНаступного разу повернися й познач, що виконано.",
+      de:"Öffne „Weg“ und hake ab, was schon zutrifft.\nLies die nächsten Schritte — oder suche unter „Kurse“ eine ganze Studie zum gemeinsamen Durcharbeiten.\nEinigt euch auf die Schritte und tragt sie mit Datum ins Sitzungsprotokoll ein.\nLade das PDF herunter und teile es.\nKomm beim nächsten Mal wieder und hake ab, was erledigt wurde.",
+      es:"Abre «Camino» y marca lo que ya es cierto.\nLee los próximos pasos, o busca en «Cursos» un estudio completo para hacer juntos.\nAcuerden los pasos y anótenlos en el Registro de la Sesión con una fecha.\nDescarga el PDF y compártelo.\nLa próxima vez, vuelve y marca lo que se hizo.",
+      it:"Apri «Percorso» e spunta ciò che è già vero.\nLeggi i prossimi passi, oppure cerca in «Corsi» uno studio completo da fare insieme.\nConcordate i passi e scriveteli nella Scheda dell’Incontro con una data.\nScarica il PDF e condividilo.\nLa volta successiva, torna e spunta ciò che è stato fatto.",
+      pl:"Otwórz „Ścieżkę” i zaznacz to, co jest już prawdą.\nPrzeczytaj kolejne kroki — albo poszukaj w „Kursach” całego studium do przejścia razem.\nUzgodnijcie kroki i zapiszcie je w protokole spotkania z datą.\nPobierz PDF i podziel się nim.\nNastępnym razem wróć i zaznacz, co zostało zrobione.",
+      fa:"«مسیر» را باز کن و آنچه از قبل صادق است را علامت بزن.\nقدم‌های بعدی را بخوان — یا در «دوره‌ها» یک مطالعه‌ی کامل برای گذراندن با هم پیدا کن.\nروی قدم‌ها توافق کنید و آن‌ها را با تاریخ در گزارش جلسه بنویسید.\nPDF را دانلود و به‌اشتراک بگذار.\nدفعه‌ی بعد برگرد و آنچه انجام شده را علامت بزن."
+    },
+    list: true
+  }
+};
+
+// target: CSS selector (null = centred card). view: view this step needs. grow: highlight the parent.
+var TOUR_STEPS = [
+  {id:"welcome"},
+  {id:"lang",     target:"#langRow"},
+  {id:"tabs",     target:"#viewTabs"},
+  {id:"record",   target:"#recordCard"},
+  {id:"pdf",      target:"#printBtn"},
+  {id:"overview", target:".overview-wrap .table-scroll", view:"pathway"},
+  {id:"stagebar", target:"#stageNav", view:"pathway"},
+  {id:"next",     target:"#nextGrid", view:"pathway"},
+  {id:"res",      target:"#nextGrid .res", view:"pathway"},
+  {id:"cc",       target:"#nextGrid .cc-btn", view:"pathway", grow:true},
+  {id:"items",    target:"#columns", view:"pathway"},
+  {id:"courses",  target:"#coursesView .course-controls", view:"courses"},
+  {id:"grid",     target:"#coursesView .cov-grid", view:"courses"},
+  {id:"matlang",  target:"#matLangSel", view:"courses", grow:true},
+  {id:"data"},
+  {id:"flow"}
+];
+
+var tour = {active:false, list:[], i:0, prevView:null, els:null};
+
+function tt(id, field){
+  var row = TOUR_TXT[id] && TOUR_TXT[id][field];
+  if (!row) return "";
+  return row[currentLang] || row.en;
+}
+
+function tourBuild(){
+  if (tour.els) return tour.els;
+  var shield = document.createElement("div");
+  shield.id = "tourShield"; shield.className = "tour-shield"; shield.hidden = true;
+  var spot = document.createElement("div");
+  spot.id = "tourSpot"; spot.className = "tour-spot"; spot.hidden = true;
+  var pop = document.createElement("div");
+  pop.id = "tourPop"; pop.className = "tour-pop"; pop.hidden = true;
+  pop.setAttribute("role", "dialog"); pop.setAttribute("aria-modal", "true"); pop.setAttribute("aria-labelledby", "tourTitle");
+  pop.innerHTML =
+    '<div class="tour-top"><span class="tour-count" id="tourCount"></span>' +
+    '<button type="button" class="tour-x" id="tourX"></button></div>' +
+    '<h4 class="tour-title" id="tourTitle"></h4>' +
+    '<div class="tour-text" id="tourText"></div>' +
+    '<div class="tour-nav"><button type="button" class="tour-link" id="tourSkip"></button><span class="tour-sp"></span>' +
+    '<button type="button" class="tour-sec" id="tourBack"></button>' +
+    '<button type="button" class="tour-pri" id="tourNext"></button></div>';
+  document.body.appendChild(shield);
+  document.body.appendChild(spot);
+  document.body.appendChild(pop);
+  tour.els = {shield:shield, spot:spot, pop:pop};
+  pop.querySelector("#tourX").addEventListener("click", tourClose);
+  pop.querySelector("#tourSkip").addEventListener("click", tourClose);
+  pop.querySelector("#tourBack").addEventListener("click", function(){ tourGo(-1); });
+  pop.querySelector("#tourNext").addEventListener("click", function(){ tourGo(1); });
+  window.addEventListener("resize", function(){ if (tour.active) tourPlace(); });
+  return tour.els;
+}
+
+function tourStart(){
+  var els = tourBuild();
+  try { localStorage.setItem(TOUR_KEY, "1"); } catch(e) {}
+  tourHideHint();
+  tour.prevView = view;
+  filt.item = null; filt.stage = "all"; filt.div = "all";
+  tour.list = TOUR_STEPS.filter(function(s){ return !s.target || document.querySelector(s.target); });
+  tour.i = 0;
+  tour.active = true;
+  els.shield.hidden = false;
+  tourShow();
+}
+
+function tourClose(){
+  if (!tour.active) return;
+  tour.active = false;
+  var els = tour.els;
+  els.shield.hidden = true; els.spot.hidden = true; els.pop.hidden = true;
+  if (tour.prevView && tour.prevView !== view) setView(tour.prevView); else renderAll();
+  try { window.scrollTo(0, 0); } catch(e) {}
+}
+
+function tourGo(d){
+  var n = tour.i + d;
+  if (n < 0) return;
+  if (n >= tour.list.length){ tourClose(); return; }
+  tour.i = n;
+  tourShow();
+}
+
+function tourShow(){
+  var st = tour.list[tour.i];
+  if (st.view && st.view !== view) setView(st.view);
+  var els = tour.els, pop = els.pop;
+  document.getElementById("tourCount").textContent = fillTemplate(t("tourOf"), {n:tour.i + 1, total:tour.list.length});
+  document.getElementById("tourTitle").textContent = tt(st.id, "title");
+  var body = tt(st.id, "text");
+  var tx = document.getElementById("tourText");
+  if (TOUR_TXT[st.id].list){
+    tx.innerHTML = '<ol>' + body.split("\n").map(function(l){ return '<li>'+escapeHtml(l)+'</li>'; }).join("") + '</ol>';
+  } else {
+    tx.textContent = body;
+  }
+  var last = tour.i === tour.list.length - 1;
+  document.getElementById("tourX").setAttribute("aria-label", t("tourClose"));
+  document.getElementById("tourX").innerHTML = "&times;";
+  document.getElementById("tourSkip").textContent = t("tourSkip");
+  document.getElementById("tourSkip").hidden = last;
+  document.getElementById("tourBack").textContent = t("tourBack");
+  document.getElementById("tourBack").disabled = (tour.i === 0);
+  document.getElementById("tourNext").textContent = last ? t("tourDone") : t("tourNext");
+  pop.hidden = false;
+  // let the view switch re-render settle, then scroll and place
+  setTimeout(function(){
+    if (!tour.active) return;
+    tourScrollTo(st);
+    tourPlace();
+    var nb = document.getElementById("tourNext"); if (nb && nb.focus) nb.focus({preventScroll:true});
+  }, 40);
+}
+
+function tourTarget(st){
+  if (!st.target) return null;
+  var el = document.querySelector(st.target);
+  if (el && st.grow && el.parentElement) el = el.parentElement;
+  return el;
+}
+
+function tourScrollTo(st){
+  var el = tourTarget(st);
+  if (!el || !el.scrollIntoView) { try { window.scrollTo(0, 0); } catch(e) {} return; }
+  var r = el.getBoundingClientRect();
+  var tall = r.height > window.innerHeight * 0.5;
+  el.scrollIntoView({block: (tall || window.innerWidth < 600) ? "start" : "center", behavior:"auto"});
+}
+
+function tourPlace(){
+  if (!tour.active) return;
+  var st = tour.list[tour.i];
+  var els = tour.els, spot = els.spot, pop = els.pop;
+  var el = tourTarget(st);
+  var vw = window.innerWidth, vh = window.innerHeight;
+  var sx = window.pageXOffset || 0, sy = window.pageYOffset || 0;
+  pop.classList.remove("center", "dock");
+  pop.style.left = ""; pop.style.top = ""; pop.style.right = ""; pop.style.bottom = "";
+  if (!el){
+    spot.hidden = true;
+    pop.classList.add("center");
+    return;
+  }
+  var r = el.getBoundingClientRect();
+  var pad = 6;
+  spot.hidden = false;
+  spot.style.left = (r.left + sx - pad) + "px";
+  spot.style.top = (r.top + sy - pad) + "px";
+  spot.style.width = (r.width + pad*2) + "px";
+  spot.style.height = (r.height + pad*2) + "px";
+  var popH = pop.offsetHeight, popW = pop.offsetWidth;
+  var tall = r.height > vh * 0.5;
+  if (vw < 600 || tall){
+    pop.classList.add("dock");
+    return;
+  }
+  var below = r.bottom + 14 + popH <= vh;
+  var above = r.top - 14 - popH >= 0;
+  var top;
+  if (below) top = r.bottom + sy + 14;
+  else if (above) top = r.top + sy - 14 - popH;
+  else { pop.classList.add("dock"); return; }
+  var left = r.left + sx;
+  if (left + popW > sx + vw - 12) left = sx + vw - 12 - popW;
+  if (left < sx + 12) left = sx + 12;
+  pop.style.top = top + "px";
+  pop.style.left = left + "px";
+}
+
+function tourHideHint(){
+  var h = document.getElementById("tourHint");
+  if (h) h.hidden = true;
+}
+function applyTourI18n(){
+  var b = document.getElementById("tourBtn");
+  if (b) b.textContent = "❓ " + t("tourBtn");
+  var ht = document.getElementById("tourHintText");
+  if (ht) ht.textContent = t("tourHint");
+  var hx = document.getElementById("tourHintX");
+  if (hx) hx.setAttribute("aria-label", t("tourClose"));
+}
+
+var TOUR_KEY = "discipling-pathway-tour-v1";
+(function initTour(){
+  var seen = false;
+  try { seen = !!localStorage.getItem(TOUR_KEY); } catch(e) {}
+  var btn = document.getElementById("tourBtn");
+  var hint = document.getElementById("tourHint");
+  if (hint) hint.hidden = seen;
+  if (btn) btn.addEventListener("click", tourStart);
+  var hint2 = document.getElementById("tourHintText");
+  if (hint2) hint2.addEventListener("click", tourStart);
+  var hx = document.getElementById("tourHintX");
+  if (hx) hx.addEventListener("click", function(){
+    try { localStorage.setItem(TOUR_KEY, "1"); } catch(e) {}
+    tourHideHint();
+  });
+  document.addEventListener("keydown", function(e){
+    if (!tour.active) return;
+    var rtl = RTL_LANGS.indexOf(currentLang) !== -1;
+    if (e.key === "Escape"){ e.preventDefault(); tourClose(); }
+    else if (e.key === "ArrowRight"){ e.preventDefault(); tourGo(rtl ? -1 : 1); }
+    else if (e.key === "ArrowLeft"){ e.preventDefault(); tourGo(rtl ? 1 : -1); }
+  });
+})();
+
+// ---- session record card (name/date fields + print) ----
+var RECORD_KEY = "discipling-pathway-record-v1";
+var RECORD_FIELDS = ["rfDisciple","rfDiscipler","rfDate","rfNextSteps","rfDueDate"];
+(function initRecordCard(){
+  var saved = {};
+  try {
+    var raw = localStorage.getItem(RECORD_KEY);
+    if (raw) saved = JSON.parse(raw) || {};
+  } catch(e) { saved = {}; }
+
+  RECORD_FIELDS.forEach(function(id){
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (saved[id] != null) el.value = saved[id];
+    el.addEventListener("input", function(){
+      saved[id] = el.value;
+      try { localStorage.setItem(RECORD_KEY, JSON.stringify(saved)); } catch(e) {}
+    });
+  });
+
+  var printBtn = document.getElementById("printBtn");
+  var statusEl = document.getElementById("printStatus");
+  function setStatus(msg, isError){
+    if (!statusEl) return;
+    statusEl.textContent = msg || "";
+    statusEl.classList.toggle("error", !!isError);
+  }
+  if (printBtn){
+    printBtn.addEventListener("click", function(){
+      generatePdf().catch(function(err){
+        console.error(err);
+        setStatus(t("statusRetry"), true);
+        printBtn.disabled = false;
+        printBtn.textContent = t("btnDownload");
+      });
+    });
+  }
+
+  async function generatePdf(){
+    if (typeof html2canvas === "undefined" || !window.jspdf){
+      setStatus(t("statusToolsFailed"), true);
+      return;
+    }
+    printBtn.disabled = true;
+    printBtn.textContent = t("btnPreparing");
+    setStatus(t("statusRendering"));
+
+    var target = document.querySelector(".wrap");
+    var bg = getComputedStyle(document.body).backgroundColor;
+    var canvas = await html2canvas(target, {
+      scale:2, backgroundColor:bg, useCORS:true,
+      ignoreElements: function(el){ return el.id === "langRow" || el.id === "viewTabs" || el.id === "tourShield" || el.id === "tourSpot" || el.id === "tourPop"; }
+    });
+
+    var jsPDF = window.jspdf.jsPDF;
+    var pdf = new jsPDF({unit:"pt", format:"a4"});
+    var pageWidth = pdf.internal.pageSize.getWidth();
+    var pageHeight = pdf.internal.pageSize.getHeight();
+    var imgWidth = pageWidth;
+    var imgHeight = canvas.height * imgWidth / canvas.width;
+    var imgData = canvas.toDataURL("image/png");
+
+    var heightLeft = imgHeight;
+    var position = 0;
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+    while (heightLeft > 0){
+      position -= pageHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    var blob = pdf.output("blob");
+    var name = (document.getElementById("rfDisciple") || {}).value || "";
+    var filename = "iDisciple" + (name ? "-" + name.replace(/[^a-z0-9]+/gi,"-") : "") + ".pdf";
+
+    setStatus(t("statusWaiting"));
+    var downloads = await (window.claude ? window.claude.use("downloads") : null);
+    printBtn.disabled = false;
+    printBtn.textContent = t("btnDownload");
+    if (!downloads){
+      // Outside claude.ai (e.g. GitHub Pages): ordinary browser download.
+      try {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+        setStatus(t("statusSaved"));
+      } catch(err){
+        setStatus(t("statusUnavailable"), true);
+      }
+      return;
+    }
+    try {
+      await downloads.save({filename: filename, data: blob});
+      setStatus(t("statusSaved"));
+    } catch(err){
+      if (err && err.code === "declined"){
+        setStatus("");
+      } else {
+        setStatus(t("statusRetry") + " (" + (err && err.code || "?") + ")", true);
+      }
+    }
+  }
+})();
+
+applyStaticI18n();
+renderAll();
+})();
+</script>
+
+</body></html>
