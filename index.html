@@ -257,7 +257,7 @@ footer.note b{ color:var(--ink); }
 .mini-item input{ margin-top:2px; width:13px; height:13px; flex:none; }
 .mini-item.checked span{ color:var(--ink-dim); text-decoration:line-through; text-decoration-color:var(--line); }
 
-/* View tabs (Pathway | Courses) */
+/* View tabs (Chart | Resources) */
 [hidden]{ display:none !important; }
 .view-tabs{
   display:inline-flex; gap:0; margin:0 0 22px; border:1px solid var(--line); border-radius:999px;
@@ -1096,8 +1096,8 @@ function renderAll(){
 // A session with no file yet is shown dimmed ("no file yet").
 // ===========================================================================
 var COURSE_UI = {
-  tabPathway: {en:"Pathway", uk:"Шлях", de:"Weg", es:"Camino", it:"Percorso", pl:"Ścieżka", fa:"مسیر"},
-  tabCourses: {en:"Courses", uk:"Курси", de:"Kurse", es:"Cursos", it:"Corsi", pl:"Kursy", fa:"دوره‌ها"},
+  tabPathway: {en:"Chart", uk:"Схема", de:"Schema", es:"Cuadro", it:"Schema", pl:"Schemat", fa:"نمودار"},
+  tabCourses: {en:"Resources", uk:"Ресурси", de:"Ressourcen", es:"Recursos", it:"Risorse", pl:"Materiały", fa:"منابع"},
   coursesTitle: {en:"Course Library", uk:"Бібліотека курсів", de:"Kursbibliothek", es:"Biblioteca de cursos", it:"Biblioteca dei corsi", pl:"Biblioteka kursów", fa:"کتابخانه دوره‌ها"},
   coursesHint: {
     en:"Whole courses to go through with someone. Each card shows which areas of the chart the course covers — darker cells mean more of that cell’s items are covered. Click a cell to see which items, or open the sessions to get the files. Course and lesson names stay in English because they match your file names.",
@@ -1683,15 +1683,15 @@ var TOUR_TXT = {
     }
   },
   tabs: {
-    title: {en:"Pathway and Courses", uk:"Шлях і Курси", de:"Weg und Kurse", es:"Camino y Cursos", it:"Percorso e Corsi", pl:"Ścieżka i Kursy", fa:"مسیر و دوره‌ها"},
+    title: {en:"Chart and Resources", uk:"Схема і Ресурси", de:"Schema und Ressourcen", es:"Cuadro y Recursos", it:"Schema e Risorse", pl:"Schemat i Materiały", fa:"نمودار و منابع"},
     text: {
-      en:"Pathway is the growth chart with your next steps. Courses is a library of whole studies to go through with someone, showing which areas of the chart each one covers.",
-      uk:"«Шлях» — це схема зростання з твоїми наступними кроками. «Курси» — бібліотека цілих студій, які можна пройти з кимось; вона показує, які сфери схеми охоплює кожна.",
-      de:"„Weg“ ist das Wachstumsschema mit deinen nächsten Schritten. „Kurse“ ist eine Bibliothek ganzer Studien zum gemeinsamen Durcharbeiten und zeigt, welche Bereiche des Schemas jede abdeckt.",
-      es:"«Camino» es el cuadro de crecimiento con tus próximos pasos. «Cursos» es una biblioteca de estudios completos para recorrer con alguien, que muestra qué áreas del cuadro cubre cada uno.",
-      it:"«Percorso» è lo schema di crescita con i tuoi prossimi passi. «Corsi» è una biblioteca di studi completi da fare insieme a qualcuno e mostra quali aree dello schema copre ciascuno.",
-      pl:"„Ścieżka” to schemat wzrostu z twoimi kolejnymi krokami. „Kursy” to biblioteka całych studiów do przejścia z kimś; pokazuje, które obszary schematu obejmuje każdy z nich.",
-      fa:"«مسیر» نمودار رشد همراه با قدم‌های بعدی توست. «دوره‌ها» کتابخانه‌ای از مطالعات کامل برای گذراندن همراه با دیگری است و نشان می‌دهد هر کدام کدام حوزه‌های نمودار را پوشش می‌دهد."
+      en:"Chart is the growth chart with your next steps. Resources is a library of whole studies to go through with someone, showing which areas of the chart each one covers.",
+      uk:"«Схема» — це схема зростання з твоїми наступними кроками. «Ресурси» — бібліотека цілих студій, які можна пройти з кимось; вона показує, які сфери схеми охоплює кожна.",
+      de:"„Schema“ ist das Wachstumsschema mit deinen nächsten Schritten. „Ressourcen“ ist eine Bibliothek ganzer Studien zum gemeinsamen Durcharbeiten und zeigt, welche Bereiche des Schemas jede abdeckt.",
+      es:"«Cuadro» es el cuadro de crecimiento con tus próximos pasos. «Recursos» es una biblioteca de estudios completos para recorrer con alguien, que muestra qué áreas del cuadro cubre cada uno.",
+      it:"«Schema» è lo schema di crescita con i tuoi prossimi passi. «Risorse» è una biblioteca di studi completi da fare insieme a qualcuno e mostra quali aree dello schema copre ciascuno.",
+      pl:"„Schemat” to schemat wzrostu z twoimi kolejnymi krokami. „Materiały” to biblioteka całych studiów do przejścia z kimś; pokazuje, które obszary schematu obejmuje każdy z nich.",
+      fa:"«نمودار» نمودار رشد همراه با قدم‌های بعدی توست. «منابع» کتابخانه‌ای از مطالعات کامل برای گذراندن همراه با دیگری است و نشان می‌دهد هر کدام کدام حوزه‌های نمودار را پوشش می‌دهد."
     }
   },
   record: {
@@ -1769,13 +1769,13 @@ var TOUR_TXT = {
   cc: {
     title: {en:"Courses covering this", uk:"Курси, що це охоплюють", de:"Kurse dazu", es:"Cursos que lo cubren", it:"Corsi che lo coprono", pl:"Kursy na ten temat", fa:"دوره‌های مرتبط"},
     text: {
-      en:"When courses cover an item, this link jumps to the Courses view filtered to that item, with the matching sessions highlighted.",
-      uk:"Коли курси охоплюють пункт, це посилання веде до перегляду «Курси», відфільтрованого за цим пунктом, із виділеними відповідними сесіями.",
-      de:"Wenn Kurse einen Punkt abdecken, springt dieser Link zur Kursansicht, gefiltert auf diesen Punkt, mit hervorgehobenen passenden Einheiten.",
-      es:"Cuando hay cursos que cubren un elemento, este enlace salta a la vista de Cursos filtrada por ese elemento, con las sesiones correspondientes resaltadas.",
-      it:"Quando dei corsi coprono una voce, questo link porta alla vista Corsi filtrata su quella voce, con gli incontri corrispondenti evidenziati.",
-      pl:"Gdy kursy obejmują daną pozycję, ten link przenosi do widoku Kursów przefiltrowanego do tej pozycji, z wyróżnionymi pasującymi spotkaniami.",
-      fa:"وقتی دوره‌هایی یک مورد را پوشش می‌دهند، این پیوند به نمای دوره‌ها می‌رود که بر اساس همان مورد فیلتر شده و جلسات مرتبط در آن مشخص شده‌اند."
+      en:"When courses cover an item, this link jumps to the Resources view filtered to that item, with the matching sessions highlighted.",
+      uk:"Коли курси охоплюють пункт, це посилання веде до перегляду «Ресурси», відфільтрованого за цим пунктом, із виділеними відповідними сесіями.",
+      de:"Wenn Kurse einen Punkt abdecken, springt dieser Link zur Ansicht „Ressourcen“, gefiltert auf diesen Punkt, mit hervorgehobenen passenden Einheiten.",
+      es:"Cuando hay cursos que cubren un elemento, este enlace salta a la vista de Recursos filtrada por ese elemento, con las sesiones correspondientes resaltadas.",
+      it:"Quando dei corsi coprono una voce, questo link porta alla vista Risorse filtrata su quella voce, con gli incontri corrispondenti evidenziati.",
+      pl:"Gdy kursy obejmują daną pozycję, ten link przenosi do widoku Materiałów przefiltrowanego do tej pozycji, z wyróżnionymi pasującymi spotkaniami.",
+      fa:"وقتی دوره‌هایی یک مورد را پوشش می‌دهند، این پیوند به نمای منابع می‌رود که بر اساس همان مورد فیلتر شده و جلسات مرتبط در آن مشخص شده‌اند."
     }
   },
   items: {
