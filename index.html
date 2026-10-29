@@ -99,6 +99,7 @@ h1,h2,h3,.display{ font-family:'Fraunces', Georgia, serif; }
 :root[dir="rtl"] textarea{ direction:rtl; text-align:right; }
 :root[dir="rtl"] .lang-row{ direction:ltr; }
 :root[dir="rtl"] .next-card .done-check{ direction:rtl; }
+:root[dir="rtl"] .cal-add-label, :root[dir="rtl"] .cal-status{ direction:rtl; text-align:right; }
 
 header.top{ margin-bottom:28px; }
 .header-row{ display:flex; align-items:flex-start; gap:26px; flex-wrap:wrap; }
@@ -139,9 +140,22 @@ h1{ font-size:clamp(28px,5vw,40px); font-weight:600; margin:0 0 10px; text-wrap:
 .print-btn:disabled{ opacity:.6; cursor:default; }
 .print-status{ margin-top:8px; font-size:12px; color:var(--ink-dim); min-height:14px; }
 .print-status.error{ color:#b0432f; }
+.cal-add{ margin-top:12px; }
+.cal-add-label{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-dim); font-weight:700; margin-bottom:6px; }
+.cal-add-btns{ display:flex; gap:8px; flex-wrap:wrap; }
+.cal-btn{
+  flex:1 1 auto; padding:8px 10px; border:1px solid var(--line); border-radius:9px;
+  background:var(--bg); color:var(--ink); font-family:'Karla',sans-serif; font-weight:700;
+  font-size:12.5px; cursor:pointer;
+}
+.cal-btn:hover{ filter:brightness(1.05); background:var(--surface); }
+.cal-btn:disabled{ opacity:.6; cursor:default; }
+.cal-status{ margin-top:6px; font-size:12px; color:var(--ink-dim); min-height:14px; }
+.cal-status.error{ color:#b0432f; }
 
 @media print{
   .print-btn{ display:none !important; }
+  .cal-add{ display:none !important; }
   body{ background:#fff; padding:0; }
   *{ box-shadow:none !important; color-adjust:exact; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   .col, .next-card, .item, tr{ break-inside:avoid; }
@@ -483,6 +497,14 @@ footer.note b{ color:var(--ink); }
         <textarea id="rfNextSteps"></textarea>
         <label for="rfDueDate" id="lblDueDate"></label>
         <input type="date" id="rfDueDate">
+        <div class="cal-add" id="calAdd" hidden>
+          <div class="cal-add-label" id="calAddLabel"></div>
+          <div class="cal-add-btns">
+            <button type="button" class="cal-btn" id="calIcalBtn"></button>
+            <button type="button" class="cal-btn" id="calGoogleBtn"></button>
+          </div>
+          <div class="cal-status" id="calStatus" aria-live="polite"></div>
+        </div>
         <button type="button" class="print-btn" id="printBtn"></button>
         <div class="print-status" id="printStatus" aria-live="polite"></div>
       </div>
@@ -523,6 +545,7 @@ footer.note b{ color:var(--ink); }
 "use strict";
 
 var STAGES = [
+  {id:"seeker", name:"Unbeliever"},
   {id:"nb", name:"New Born"},
   {id:"disciple", name:"Disciple"},
   {id:"worker", name:"Worker"},
@@ -547,6 +570,7 @@ var LANG_NAMES = {en:"EN", uk:"UA", de:"DE", es:"ES", it:"IT", pl:"PL", fa:"FA"}
 var RTL_LANGS = ["fa"];
 
 var STAGE_TR = {
+  seeker:   {en:"Unbeliever", uk:"Невіруючий", de:"Ungläubiger", es:"No creyente", it:"Non credente", pl:"Niewierzący", fa:"غیرایماندار"},
   nb:       {en:"New Born",  uk:"Новонароджений", de:"Neugeboren",     es:"Recién Nacido", it:"Neonato",       pl:"Nowo narodzony", fa:"نوزاد"},
   disciple: {en:"Disciple",  uk:"Учень",          de:"Jünger",         es:"Discípulo",     it:"Discepolo",     pl:"Uczeń",          fa:"شاگرد"},
   worker:   {en:"Worker",    uk:"Працівник",      de:"Mitarbeiter",    es:"Obrero",        it:"Collaboratore", pl:"Pracownik",      fa:"خادم"},
@@ -563,6 +587,17 @@ var DIV_TR = {
 };
 
 var TITLE_TR = {
+  // Unbeliever
+  "Does God exist?": {uk:"Чи існує Бог?", de:"Gibt es Gott?", es:"¿Existe Dios?", it:"Dio esiste?", pl:"Czy Bóg istnieje?", fa:"آیا خدا وجود دارد؟"},
+  "Who is Jesus?": {uk:"Хто такий Ісус?", de:"Wer ist Jesus?", es:"¿Quién es Jesús?", it:"Chi è Gesù?", pl:"Kim jest Jezus?", fa:"عیسی کیست؟"},
+  "Can the Bible be trusted?": {uk:"Чи можна довіряти Біблії?", de:"Kann man der Bibel vertrauen?", es:"¿Se puede confiar en la Biblia?", it:"Ci si può fidare della Bibbia?", pl:"Czy można ufać Biblii?", fa:"آیا می‌توان به کتاب‌مقدس اعتماد کرد؟"},
+  "The gospel message": {uk:"Звістка Євангелія", de:"Die Botschaft des Evangeliums", es:"El mensaje del evangelio", it:"Il messaggio del Vangelo", pl:"Przesłanie Ewangelii", fa:"پیام انجیل"},
+  "Exploring questions openly": {uk:"Відкрито досліджувати питання", de:"Fragen offen erkunden", es:"Explorar las preguntas abiertamente", it:"Esplorare apertamente le domande", pl:"Otwarte zgłębianie pytań", fa:"بررسی آزادانه پرسش‌ها"},
+  "Reading a Gospel": {uk:"Читання Євангелія", de:"Ein Evangelium lesen", es:"Leer un Evangelio", it:"Leggere un Vangelo", pl:"Czytanie Ewangelii", fa:"خواندن یکی از انجیل‌ها"},
+  "Responding to Christ": {uk:"Відповідь Христу", de:"Auf Christus antworten", es:"Responder a Cristo", it:"Rispondere a Cristo", pl:"Odpowiedź na wezwanie Chrystusa", fa:"پاسخ دادن به مسیح"},
+  "Openness / seeking": {uk:"Відкритість / пошук", de:"Offenheit / Suchen", es:"Apertura / búsqueda", it:"Apertura / ricerca", pl:"Otwartość / poszukiwanie", fa:"گشودگی / جستجو"},
+  "Honesty about sin": {uk:"Чесність щодо гріха", de:"Ehrlichkeit über die Sünde", es:"Honestidad sobre el pecado", it:"Onestà riguardo al peccato", pl:"Szczerość wobec grzechu", fa:"صداقت درباره گناه"},
+  "Repentance and faith": {uk:"Покаяння і віра", de:"Umkehr und Glaube", es:"Arrepentimiento y fe", it:"Pentimento e fede", pl:"Nawrócenie i wiara", fa:"توبه و ایمان"},
   // Being / Character
   "Reliable": {uk:"Надійний", de:"Zuverlässig", es:"Fiable", it:"Affidabile", pl:"Rzetelny", fa:"قابل‌اعتماد"},
   "Faithful in physical areas": {uk:"Вірний у практичних сферах", de:"Treu in praktischen Bereichen", es:"Fiel en las áreas físicas", it:"Fedele negli ambiti pratici", pl:"Wierny w sprawach praktycznych", fa:"امین در امور عملی"},
@@ -627,13 +662,13 @@ var TITLE_TR = {
 var UI_STRINGS = {
   eyebrow: {en:"New Born → Disciple → Worker → Leader"}, // built from STAGE_TR at render time instead
   lede: {
-    en:'A map of spiritual growth from new life in Christ to leadership, in three areas — <b>Knowing</b> (doctrine), <b>Doing</b> (conduct), and <b>Being</b> (character) — drawn from the qualifications of an elder in 1&nbsp;Timothy&nbsp;3 and Titus&nbsp;1. Though written for overseers, these areas of growth apply to every believer, women included. Check off what’s already true of you or the person you’re discipling, and your next steps — with resources for each — will surface automatically.',
-    uk:'Карта духовного зростання від нового життя в Христі до лідерства, у трьох сферах — <b>Знання</b> (вчення), <b>Дії</b> (поведінка) та <b>Буття</b> (характер) — складена на основі вимог до старійшини в 1&nbsp;Тимофія&nbsp;3 та Титу&nbsp;1. Хоча ці вимоги написані для єпископів (наглядачів), ці сфери зростання стосуються кожного віруючого, включно з жінками. Познач те, що вже є правдою про тебе або про людину, яку ти наставляєш, — і твої наступні кроки з відповідними ресурсами з’являться автоматично.',
-    de:'Eine Landkarte geistlichen Wachstums von der Neugeburt in Christus bis zur Leiterschaft, in drei Bereichen — <b>Wissen</b> (Lehre), <b>Handeln</b> (Wandel) und <b>Sein</b> (Charakter) — abgeleitet aus den Anforderungen an einen Ältesten in 1.&nbsp;Timotheus&nbsp;3 und Titus&nbsp;1. Obwohl für Aufseher geschrieben, gelten diese Wachstumsbereiche für jeden Gläubigen, auch für Frauen. Hake ab, was bei dir oder der Person, die du jüngerst, bereits zutrifft — deine nächsten Schritte samt passenden Ressourcen erscheinen dann automatisch.',
-    es:'Un mapa del crecimiento espiritual desde el nuevo nacimiento en Cristo hasta el liderazgo, en tres áreas — <b>Saber</b> (doctrina), <b>Hacer</b> (conducta) y <b>Ser</b> (carácter) — tomadas de los requisitos de un anciano en 1&nbsp;Timoteo&nbsp;3 y Tito&nbsp;1. Aunque se escribieron para los ancianos/obispos, estas áreas de crecimiento aplican a todo creyente, incluidas las mujeres. Marca lo que ya es cierto de ti o de la persona que estás discipulando, y tus próximos pasos — con recursos para cada uno — aparecerán automáticamente.',
-    it:'Una mappa della crescita spirituale dalla nuova nascita in Cristo fino alla leadership, in tre aree — <b>Sapere</b> (dottrina), <b>Fare</b> (condotta) ed <b>Essere</b> (carattere) — tratte dai requisiti per un anziano in 1&nbsp;Timoteo&nbsp;3 e Tito&nbsp;1. Sebbene scritte per i sovrintendenti, queste aree di crescita si applicano a ogni credente, comprese le donne. Spunta ciò che è già vero di te o della persona che stai discepolando: i tuoi prossimi passi, con le relative risorse, appariranno automaticamente.',
-    pl:'Mapa duchowego wzrostu od nowego życia w Chrystusie aż do przywództwa, w trzech obszarach — <b>Wiedza</b> (doktryna), <b>Działanie</b> (postępowanie) i <b>Bycie</b> (charakter) — oparta na wymaganiach stawianych starszemu w 1&nbsp;Tymoteusza&nbsp;3 i Tytusa&nbsp;1. Choć napisane dla biskupów (nadzorców), te obszary wzrostu dotyczą każdego wierzącego, w tym kobiet. Zaznacz, co jest już prawdą o tobie lub o osobie, którą dyscyplinujesz, a twoje kolejne kroki — wraz z materiałami do każdego z nich — pojawią się automatycznie.',
-    fa:'نقشه‌ای از رشد روحانی، از تولد تازه در مسیح تا رهبری، در سه حوزه — <b>شناخت</b> (تعلیم)، <b>عمل</b> (رفتار) و <b>بودن</b> (شخصیت) — برگرفته از شرایط لازم برای یک شیخ (ناظر) در رساله اول تیموتائوس&nbsp;۳ و تیتوس&nbsp;۱. اگرچه این شرایط برای ناظران نوشته شده، این حوزه‌های رشد برای هر ایماندار، از جمله زنان، کاربرد دارد. آنچه را که از قبل درباره‌ی خودت یا شخصی که شاگردسازی می‌کنی صادق است علامت بزن، و قدم‌های بعدی تو — همراه با منابع برای هر کدام — به‌طور خودکار نمایان خواهد شد.'
+    en:'The first stage, <b>Unbeliever</b>, offers apologetic material for someone still exploring the faith. A map of spiritual growth from new life in Christ to leadership, in three areas — <b>Knowing</b> (doctrine), <b>Doing</b> (conduct), and <b>Being</b> (character) — drawn from the qualifications of an elder in 1&nbsp;Timothy&nbsp;3 and Titus&nbsp;1. Though written for overseers, these areas of growth apply to every believer, women included. Check off what’s already true of you or the person you’re discipling, and your next steps — with resources for each — will surface automatically.',
+    uk:'Перший етап — <b>Невіруючий</b> — містить апологетичні матеріали для тих, хто ще досліджує віру. Карта духовного зростання від нового життя в Христі до лідерства, у трьох сферах — <b>Знання</b> (вчення), <b>Дії</b> (поведінка) та <b>Буття</b> (характер) — складена на основі вимог до старійшини в 1&nbsp;Тимофія&nbsp;3 та Титу&nbsp;1. Хоча ці вимоги написані для єпископів (наглядачів), ці сфери зростання стосуються кожного віруючого, включно з жінками. Познач те, що вже є правдою про тебе або про людину, яку ти наставляєш, — і твої наступні кроки з відповідними ресурсами з’являться автоматично.',
+    de:'Die erste Stufe, <b>Ungläubiger</b>, bietet apologetisches Material für Menschen, die den Glauben noch erkunden. Eine Landkarte geistlichen Wachstums von der Neugeburt in Christus bis zur Leiterschaft, in drei Bereichen — <b>Wissen</b> (Lehre), <b>Handeln</b> (Wandel) und <b>Sein</b> (Charakter) — abgeleitet aus den Anforderungen an einen Ältesten in 1.&nbsp;Timotheus&nbsp;3 und Titus&nbsp;1. Obwohl für Aufseher geschrieben, gelten diese Wachstumsbereiche für jeden Gläubigen, auch für Frauen. Hake ab, was bei dir oder der Person, die du jüngerst, bereits zutrifft — deine nächsten Schritte samt passenden Ressourcen erscheinen dann automatisch.',
+    es:'La primera etapa, <b>No creyente</b>, ofrece material apologético para quien todavía está explorando la fe. Un mapa del crecimiento espiritual desde el nuevo nacimiento en Cristo hasta el liderazgo, en tres áreas — <b>Saber</b> (doctrina), <b>Hacer</b> (conducta) y <b>Ser</b> (carácter) — tomadas de los requisitos de un anciano en 1&nbsp;Timoteo&nbsp;3 y Tito&nbsp;1. Aunque se escribieron para los ancianos/obispos, estas áreas de crecimiento aplican a todo creyente, incluidas las mujeres. Marca lo que ya es cierto de ti o de la persona que estás discipulando, y tus próximos pasos — con recursos para cada uno — aparecerán automáticamente.',
+    it:'La prima fase, <b>Non credente</b>, offre materiale apologetico per chi sta ancora esplorando la fede. Una mappa della crescita spirituale dalla nuova nascita in Cristo fino alla leadership, in tre aree — <b>Sapere</b> (dottrina), <b>Fare</b> (condotta) ed <b>Essere</b> (carattere) — tratte dai requisiti per un anziano in 1&nbsp;Timoteo&nbsp;3 e Tito&nbsp;1. Sebbene scritte per i sovrintendenti, queste aree di crescita si applicano a ogni credente, comprese le donne. Spunta ciò che è già vero di te o della persona che stai discepolando: i tuoi prossimi passi, con le relative risorse, appariranno automaticamente.',
+    pl:'Pierwszy etap, <b>Niewierzący</b>, zawiera materiały apologetyczne dla osób, które dopiero poznają wiarę. Mapa duchowego wzrostu od nowego życia w Chrystusie aż do przywództwa, w trzech obszarach — <b>Wiedza</b> (doktryna), <b>Działanie</b> (postępowanie) i <b>Bycie</b> (charakter) — oparta na wymaganiach stawianych starszemu w 1&nbsp;Tymoteusza&nbsp;3 i Tytusa&nbsp;1. Choć napisane dla biskupów (nadzorców), te obszary wzrostu dotyczą każdego wierzącego, w tym kobiet. Zaznacz, co jest już prawdą o tobie lub o osobie, którą dyscyplinujesz, a twoje kolejne kroki — wraz z materiałami do każdego z nich — pojawią się automatycznie.',
+    fa:'مرحله‌ی نخست، <b>غیرایماندار</b>، مطالب دفاعیات را برای کسی که هنوز در حال بررسی ایمان است ارائه می‌دهد. نقشه‌ای از رشد روحانی، از تولد تازه در مسیح تا رهبری، در سه حوزه — <b>شناخت</b> (تعلیم)، <b>عمل</b> (رفتار) و <b>بودن</b> (شخصیت) — برگرفته از شرایط لازم برای یک شیخ (ناظر) در رساله اول تیموتائوس&nbsp;۳ و تیتوس&nbsp;۱. اگرچه این شرایط برای ناظران نوشته شده، این حوزه‌های رشد برای هر ایماندار، از جمله زنان، کاربرد دارد. آنچه را که از قبل درباره‌ی خودت یا شخصی که شاگردسازی می‌کنی صادق است علامت بزن، و قدم‌های بعدی تو — همراه با منابع برای هر کدام — به‌طور خودکار نمایان خواهد شد.'
   },
   recordTitle: {en:"Session Record", uk:"Протокол зустрічі", de:"Sitzungsprotokoll", es:"Registro de la Sesión", it:"Scheda dell’Incontro", pl:"Protokół spotkania", fa:"گزارش جلسه"},
   labelDisciple: {en:"Disciple", uk:"Учень", de:"Jünger", es:"Discípulo", it:"Discepolo", pl:"Uczeń", fa:"شاگرد"},
@@ -668,6 +703,28 @@ var UI_STRINGS = {
   },
   statusRetry: {en:"Couldn’t create the PDF — try again.", uk:"Не вдалося створити PDF — спробуй ще раз.", de:"PDF konnte nicht erstellt werden — bitte erneut versuchen.",
     es:"No se pudo crear el PDF — inténtalo de nuevo.", it:"Impossibile creare il PDF — riprova.", pl:"Nie udało się utworzyć PDF — spróbuj ponownie.", fa:"ساخت PDF ممکن نشد — دوباره تلاش کنید."},
+  calAddLabel: {en:"Add to calendar", uk:"Додати до календаря", de:"Zum Kalender hinzufügen", es:"Añadir al calendario", it:"Aggiungi al calendario", pl:"Dodaj do kalendarza", fa:"افزودن به تقویم"},
+  calIcalBtn: {en:"Add to iCal", uk:"Додати до iCal", de:"Zu iCal hinzufügen", es:"Añadir a iCal", it:"Aggiungi a iCal", pl:"Dodaj do iCal", fa:"افزودن به iCal"},
+  calGoogleBtn: {en:"Add to Google Calendar", uk:"Додати до Google Календаря", de:"Zu Google Kalender hinzufügen", es:"Añadir a Google Calendar", it:"Aggiungi a Google Calendar", pl:"Dodaj do Kalendarza Google", fa:"افزودن به تقویم Google"},
+  calEventTitle: {en:"iDisciple — Next steps due", uk:"iDisciple — Термін наступних кроків", de:"iDisciple — Nächste Schritte fällig", es:"iDisciple — Próximos pasos vencen", it:"iDisciple — Scadenza prossimi passi", pl:"iDisciple — Termin kolejnych kroków", fa:"iDisciple — موعد قدم‌های بعدی"},
+  calGooglePdfNote: {
+    en:"(The Session Record PDF downloaded separately — attach it to this event yourself.)",
+    uk:"(PDF протоколу зустрічі завантажено окремо — додай його до цієї події самостійно.)",
+    de:"(Das PDF des Sitzungsprotokolls wurde separat heruntergeladen — bitte selbst an dieses Ereignis anhängen.)",
+    es:"(El PDF del Registro de la Sesión se descargó por separado — adjúntalo tú mismo a este evento.)",
+    it:"(Il PDF della Scheda dell’Incontro è stato scaricato separatamente — allegalo tu stesso a questo evento.)",
+    pl:"(PDF protokołu spotkania pobrano osobno — dołącz go samodzielnie do tego wydarzenia.)",
+    fa:"(فایل PDF گزارش جلسه جداگانه دانلود شد — خودتان آن را به این رویداد پیوست کنید.)"
+  },
+  calStatusGoogleSaved: {
+    en:"Event opened in Google Calendar; PDF downloaded for you to attach.",
+    uk:"Подію відкрито в Google Календарі; PDF завантажено, додай його вручну.",
+    de:"Termin in Google Kalender geöffnet; PDF wurde heruntergeladen, bitte selbst anhängen.",
+    es:"Evento abierto en Google Calendar; PDF descargado para que lo adjuntes.",
+    it:"Evento aperto in Google Calendar; PDF scaricato da allegare manualmente.",
+    pl:"Wydarzenie otwarte w Kalendarzu Google; PDF pobrano, dołącz go ręcznie.",
+    fa:"رویداد در تقویم Google باز شد؛ PDF برای پیوست دستی دانلود شد."
+  },
   overviewTitle: {en:"Full Chart Overview", uk:"Повний огляд схеми", de:"Gesamtübersicht", es:"Resumen completo del cuadro", it:"Panoramica completa dello schema", pl:"Pełny przegląd schematu", fa:"نمای کلی کامل نمودار"},
   overviewHint: {
     en:"The whole pathway at a glance — check items directly here, or click a stage name to jump into it below.",
@@ -799,7 +856,18 @@ var ITEMS = [
   {stage:"leader", division:"practice", title:"Counseling", r:["add a resource"]},
   {stage:"leader", division:"practice", title:"Managing one's household", r:["1 Tim 3:4–5", "Titus 1:6", "Herschel Training Books — Book 3, “Design and Purpose of the Family”"]},
   {stage:"leader", division:"practice", title:"Administration", r:["add a resource"]},
-  {stage:"leader", division:"practice", title:"Overseeing", r:["1 Tim 3:1", "Herschel Training Books — Book 3, “Design and Purpose of the Church”"]}
+  {stage:"leader", division:"practice", title:"Overseeing", r:["1 Tim 3:1", "Herschel Training Books — Book 3, “Design and Purpose of the Church”"]},
+  // --- Unbeliever stage: apologetics and first steps toward faith
+  {stage:"seeker", division:"learn", title:"Does God exist?", r:["Return of the God Hypothesis (Stephen C. Meyer)", "Romans 1:20", "Psalm 19:1"]},
+  {stage:"seeker", division:"learn", title:"Who is Jesus?", r:["The Case for Christ (Lee Strobel)", "New Life Bible Studies 0.1 — The Person Jesus (nlbs0_1.doc)", "Alpha Course — “Who is Jesus?”"]},
+  {stage:"seeker", division:"learn", title:"Can the Bible be trusted?", r:["The Case for Christ (Lee Strobel) — Part 1, examining the record", "2 Timothy 3:16"]},
+  {stage:"seeker", division:"learn", title:"The gospel message", r:["Roman Road — Romans 3:23, 6:23, 5:8, 10:9–10", "New Life Bible Studies 0.2 — The Mission of Christ (nlbs0_2.doc)", "Alpha Course — “Why did Jesus die?”"]},
+  {stage:"seeker", division:"practice", title:"Exploring questions openly", r:["Alpha Course — whole course, with a group", "Acts 17:11"]},
+  {stage:"seeker", division:"practice", title:"Reading a Gospel", r:["John 20:31", "Alpha Course — “Why and how should I read the Bible?”"]},
+  {stage:"seeker", division:"practice", title:"Responding to Christ", r:["Romans 10:9–10", "New Life Bible Studies 0.5 — New Life: My Choice (nlbs0_5.doc)", "Alpha Course — “How can I have faith?”"]},
+  {stage:"seeker", division:"character", title:"Openness / seeking", r:["Jeremiah 29:13", "Alpha Course — “Is there more to life than this?”"]},
+  {stage:"seeker", division:"character", title:"Honesty about sin", r:["Romans 3:23", "New Life Bible Studies 0.3 — Where Not to Find New Life (nlbs0_3.doc)"]},
+  {stage:"seeker", division:"character", title:"Repentance and faith", r:["Acts 3:19", "Ephesians 2:8", "New Life Bible Studies 0.4 — New Life: From God (nlbs0_4.doc)"]}
 ];
 
 ITEMS.forEach(function(it, i){ it.id = it.stage + "__" + it.division + "__" + i; });
@@ -842,6 +910,12 @@ function applyStaticI18n(){
   document.getElementById("rfNextSteps").placeholder = t("placeholderNextSteps");
   var printBtn = document.getElementById("printBtn");
   if (printBtn && !printBtn.disabled) printBtn.textContent = t("btnDownload");
+  var calAddLabelEl = document.getElementById("calAddLabel");
+  if (calAddLabelEl) calAddLabelEl.textContent = t("calAddLabel");
+  var calIcalBtnEl = document.getElementById("calIcalBtn");
+  if (calIcalBtnEl && !calIcalBtnEl.disabled) calIcalBtnEl.textContent = t("calIcalBtn");
+  var calGoogleBtnEl = document.getElementById("calGoogleBtn");
+  if (calGoogleBtnEl && !calGoogleBtnEl.disabled) calGoogleBtnEl.textContent = t("calGoogleBtn");
   document.getElementById("overviewTitleText").textContent = t("overviewTitle");
   document.getElementById("overviewHintText").textContent = t("overviewHint");
   document.getElementById("nextStepsLabel").textContent = t("nextStepsLabel");
@@ -1091,7 +1165,7 @@ function renderAll(){
 // COURSE LIBRARY
 // A course is an ordered list of sessions. Each session names the chart items
 // (by their English title in ITEMS) that it covers, so each course's coverage
-// of the 4 stages x 3 areas grid is computed rather than typed by hand.
+// of the 5 stages x 3 areas grid is computed rather than typed by hand.
 // Files: a string means an English file; {en:..., de:...} lists per-language files.
 // A session with no file yet is shown dimmed ("no file yet").
 // ===========================================================================
@@ -1140,16 +1214,71 @@ function ses(n, title, f, items, pg){
 
 var COURSES = [
   {
+    id:"romanroad", title:"The Roman Road",
+    by:"4 short steps through Romans",
+    blurb:"A simple way to walk someone through the gospel using four verses from Romans: everyone has sinned, sin brings death, Christ died for us, and salvation comes by confessing and believing.",
+    groups:[
+      {name:"The Roman Road", sessions:[
+        ses("1","Everyone has sinned — Romans 3:23",null,["Honesty about sin","The gospel message"]),
+        ses("2","The wages of sin — Romans 6:23",null,["The gospel message","Honesty about sin"]),
+        ses("3","Christ died for us — Romans 5:8",null,["The gospel message","Who is Jesus?"]),
+        ses("4","Confess and believe — Romans 10:9–10",null,["Responding to Christ","Repentance and faith"])
+      ]}
+    ]
+  },
+  {
+    id:"alpha", title:"Alpha Course",
+    by:"About 11 weekly sessions plus a weekend · usually in a group with a meal",
+    blurb:"A widely used course for people exploring the Christian faith. Each session pairs a short talk or video with open discussion, so questions can be raised freely.",
+    groups:[
+      {name:"Sessions", sessions:[
+        ses("1","Is there more to life than this?",null,["Openness / seeking","Exploring questions openly"]),
+        ses("2","Who is Jesus?",null,["Who is Jesus?"]),
+        ses("3","Why did Jesus die?",null,["The gospel message"]),
+        ses("4","How can I have faith?",null,["Responding to Christ","Repentance and faith"]),
+        ses("5","Why and how do I pray?",null,["Prayer"]),
+        ses("6","Why and how should I read the Bible?",null,["Reading a Gospel","Can the Bible be trusted?"]),
+        ses("7","How does God guide us?",null,["Exploring questions openly"]),
+        ses("8","Who is the Holy Spirit? (weekend)",null,["Holy Spirit"]),
+        ses("9","How can I resist evil?",null,["Victory over sin"]),
+        ses("10","Why and how should I tell others?",null,["Witnessing"]),
+        ses("11","What about the Church?",null,["The church","Fellowship"])
+      ]}
+    ]
+  },
+  {
+    id:"caseforchrist", title:"The Case for Christ",
+    by:"Lee Strobel · book (also a film and a study guide)",
+    blurb:"A former legal journalist and atheist interviews scholars on the evidence for the reliability of the Gospels, the identity of Jesus and the resurrection.",
+    groups:[
+      {name:"Book", sessions:[
+        ses("Part 1","Examining the record — are the Gospels reliable?",null,["Can the Bible be trusted?"]),
+        ses("Part 2","Analyzing Jesus — who did he claim to be?",null,["Who is Jesus?","Deity of Christ"]),
+        ses("Part 3","Researching the resurrection",null,["Who is Jesus?","Apologetics"])
+      ]}
+    ]
+  },
+  {
+    id:"godhypothesis", title:"Return of the God Hypothesis",
+    by:"Stephen C. Meyer · book",
+    blurb:"Argues from cosmology, physics and biology that the scientific evidence points to a designing mind behind the universe and life.",
+    groups:[
+      {name:"Book", sessions:[
+        ses("—","Whole book",null,["Does God exist?","Apologetics"])
+      ]}
+    ]
+  },
+  {
     id:"nlbs", title:"New Life Bible Studies",
     by:"11 weeks · 5 short studies a week",
     blurb:"A week-by-week foundation for a new believer: finding new life, your position in Christ, God’s family, the Holy Spirit, holy living, God’s Word, habits of maturity, eternal values, serving, witnessing and the Great Commission. Daily studies to work through with a discipler.",
     groups:[
       {name:"Week 0 — Finding New Life in Christ", sessions:[
-        ses("0.1","The Person Jesus","nlbs0_1.doc",["Deity of Christ"]),
-        ses("0.2","The Mission of Christ","nlbs0_2.doc",["Assurance of salvation"]),
-        ses("0.3","Where Not to Find New Life","nlbs0_3.doc",["Assurance of salvation"]),
-        ses("0.4","New Life: From God","nlbs0_4.doc",["Assurance of salvation"]),
-        ses("0.5","New Life: My Choice","nlbs0_5.doc",["Assurance of salvation"])
+        ses("0.1","The Person Jesus","nlbs0_1.doc",["Deity of Christ","Who is Jesus?"]),
+        ses("0.2","The Mission of Christ","nlbs0_2.doc",["Assurance of salvation","The gospel message"]),
+        ses("0.3","Where Not to Find New Life","nlbs0_3.doc",["Assurance of salvation","Honesty about sin"]),
+        ses("0.4","New Life: From God","nlbs0_4.doc",["Assurance of salvation","Repentance and faith"]),
+        ses("0.5","New Life: My Choice","nlbs0_5.doc",["Assurance of salvation","Responding to Christ"])
       ]},
       {name:"Week 1 — Your New Life in Christ", sessions:[
         ses("1.1","My Position in Christ: Every Spiritual Blessing","nlbs1_1.doc",["Assurance of salvation"]),
@@ -1661,13 +1790,13 @@ var TOUR_TXT = {
   welcome: {
     title: {en:"Welcome to iDisciple", uk:"Ласкаво просимо до iDisciple", de:"Willkommen bei iDisciple", es:"Bienvenido a iDisciple", it:"Benvenuto in iDisciple", pl:"Witaj w iDisciple", fa:"به iDisciple خوش آمدی"},
     text: {
-      en:"iDisciple maps spiritual growth in four stages and three areas, then points to the next step and the material for it. This short tour shows what is on the page. Use the buttons or the arrow keys; Esc closes it.",
-      uk:"iDisciple показує духовне зростання у чотирьох етапах і трьох сферах, а потім вказує наступний крок і матеріали до нього. Ця коротка екскурсія покаже, що є на сторінці. Користуйся кнопками або стрілками на клавіатурі; Esc закриває її.",
-      de:"iDisciple zeigt geistliches Wachstum in vier Stufen und drei Bereichen und weist dann auf den nächsten Schritt samt Material hin. Dieser kurze Rundgang zeigt, was auf der Seite zu sehen ist. Nutze die Schaltflächen oder die Pfeiltasten; mit Esc schließt du ihn.",
-      es:"iDisciple muestra el crecimiento espiritual en cuatro etapas y tres áreas, y luego señala el próximo paso y el material para darlo. Este breve recorrido te enseña lo que hay en la página. Usa los botones o las flechas del teclado; Esc lo cierra.",
-      it:"iDisciple mappa la crescita spirituale in quattro fasi e tre aree, poi indica il prossimo passo e il materiale per affrontarlo. Questo breve giro mostra cosa c’è nella pagina. Usa i pulsanti o le frecce della tastiera; Esc lo chiude.",
-      pl:"iDisciple pokazuje duchowy wzrost w czterech etapach i trzech obszarach, a następnie wskazuje kolejny krok i materiały do niego. Ten krótki przewodnik pokazuje, co jest na stronie. Używaj przycisków lub strzałek; Esc go zamyka.",
-      fa:"iDisciple رشد روحانی را در چهار مرحله و سه حوزه نشان می‌دهد و سپس قدم بعدی و مطالب مربوط به آن را معرفی می‌کند. این راهنمای کوتاه نشان می‌دهد در صفحه چه چیزهایی هست. از دکمه‌ها یا کلیدهای جهت‌نما استفاده کن؛ Esc آن را می‌بندد."
+      en:"iDisciple maps the journey to faith and spiritual growth in five stages and three areas, then points to the next step and the material for it. This short tour shows what is on the page. Use the buttons or the arrow keys; Esc closes it.",
+      uk:"iDisciple показує шлях до віри та духовне зростання у п’яти етапах і трьох сферах, а потім вказує наступний крок і матеріали до нього. Ця коротка екскурсія покаже, що є на сторінці. Користуйся кнопками або стрілками на клавіатурі; Esc закриває її.",
+      de:"iDisciple zeigt den Weg zum Glauben und geistliches Wachstum in fünf Stufen und drei Bereichen und weist dann auf den nächsten Schritt samt Material hin. Dieser kurze Rundgang zeigt, was auf der Seite zu sehen ist. Nutze die Schaltflächen oder die Pfeiltasten; mit Esc schließt du ihn.",
+      es:"iDisciple muestra el camino a la fe y el crecimiento espiritual en cinco etapas y tres áreas, y luego señala el próximo paso y el material para darlo. Este breve recorrido te enseña lo que hay en la página. Usa los botones o las flechas del teclado; Esc lo cierra.",
+      it:"iDisciple mappa il cammino verso la fede e la crescita spirituale in cinque fasi e tre aree, poi indica il prossimo passo e il materiale per affrontarlo. Questo breve giro mostra cosa c’è nella pagina. Usa i pulsanti o le frecce della tastiera; Esc lo chiude.",
+      pl:"iDisciple pokazuje drogę do wiary i duchowy wzrost w pięciu etapach i trzech obszarach, a następnie wskazuje kolejny krok i materiały do niego. Ten krótki przewodnik pokazuje, co jest na stronie. Używaj przycisków lub strzałek; Esc go zamyka.",
+      fa:"iDisciple مسیر رسیدن به ایمان و رشد روحانی را در پنج مرحله و سه حوزه نشان می‌دهد و سپس قدم بعدی و مطالب مربوط به آن را معرفی می‌کند. این راهنمای کوتاه نشان می‌دهد در صفحه چه چیزهایی هست. از دکمه‌ها یا کلیدهای جهت‌نما استفاده کن؛ Esc آن را می‌بندد."
     }
   },
   lang: {
@@ -1721,13 +1850,13 @@ var TOUR_TXT = {
   overview: {
     title: {en:"Full Chart Overview", uk:"Повний огляд схеми", de:"Gesamtübersicht", es:"Resumen completo del cuadro", it:"Panoramica completa dello schema", pl:"Pełny przegląd schematu", fa:"نمای کلی کامل نمودار"},
     text: {
-      en:"The whole pathway at a glance: four stages across (New Born, Disciple, Worker, Leader) and three areas down the side — Knowing (doctrine), Doing (conduct) and Being (character). Tick what is already true; click a stage name to jump into it.",
-      uk:"Увесь шлях одним поглядом: чотири етапи зверху (Новонароджений, Учень, Працівник, Лідер) і три сфери збоку — Знання (вчення), Дії (поведінка) та Буття (характер). Познач те, що вже є правдою; натисни на назву етапу, щоб перейти до нього.",
-      de:"Der ganze Weg auf einen Blick: vier Stufen oben (Neugeboren, Jünger, Mitarbeiter, Leiter) und drei Bereiche an der Seite — Wissen (Lehre), Handeln (Wandel) und Sein (Charakter). Hake ab, was schon zutrifft; klicke auf eine Stufe, um dorthin zu springen.",
-      es:"Todo el camino de un vistazo: cuatro etapas arriba (Recién Nacido, Discípulo, Obrero, Líder) y tres áreas a un lado — Saber (doctrina), Hacer (conducta) y Ser (carácter). Marca lo que ya es cierto; haz clic en una etapa para ir a ella.",
-      it:"L’intero percorso a colpo d’occhio: quattro fasi in alto (Neonato, Discepolo, Collaboratore, Leader) e tre aree a lato — Sapere (dottrina), Fare (condotta) ed Essere (carattere). Spunta ciò che è già vero; clicca su una fase per passare a essa.",
-      pl:"Cała ścieżka na pierwszy rzut oka: cztery etapy u góry (Nowo narodzony, Uczeń, Pracownik, Lider) i trzy obszary z boku — Wiedza (doktryna), Działanie (postępowanie) i Bycie (charakter). Zaznacz, co jest już prawdą; kliknij etap, aby do niego przejść.",
-      fa:"کل مسیر در یک نگاه: چهار مرحله در بالا (نوزاد، شاگرد، خادم، رهبر) و سه حوزه در کنار — شناخت (تعلیم)، عمل (رفتار) و بودن (شخصیت). آنچه از قبل صادق است را علامت بزن؛ روی نام مرحله کلیک کن تا به آن بروی."
+      en:"The whole pathway at a glance: five stages across (Unbeliever, New Born, Disciple, Worker, Leader) and three areas down the side — Knowing (doctrine), Doing (conduct) and Being (character). Tick what is already true; click a stage name to jump into it.",
+      uk:"Увесь шлях одним поглядом: п’ять етапів зверху (Невіруючий, Новонароджений, Учень, Працівник, Лідер) і три сфери збоку — Знання (вчення), Дії (поведінка) та Буття (характер). Познач те, що вже є правдою; натисни на назву етапу, щоб перейти до нього.",
+      de:"Der ganze Weg auf einen Blick: fünf Stufen oben (Ungläubiger, Neugeboren, Jünger, Mitarbeiter, Leiter) und drei Bereiche an der Seite — Wissen (Lehre), Handeln (Wandel) und Sein (Charakter). Hake ab, was schon zutrifft; klicke auf eine Stufe, um dorthin zu springen.",
+      es:"Todo el camino de un vistazo: cinco etapas arriba (No creyente, Recién Nacido, Discípulo, Obrero, Líder) y tres áreas a un lado — Saber (doctrina), Hacer (conducta) y Ser (carácter). Marca lo que ya es cierto; haz clic en una etapa para ir a ella.",
+      it:"L’intero percorso a colpo d’occhio: cinque fasi in alto (Non credente, Neonato, Discepolo, Collaboratore, Leader) e tre aree a lato — Sapere (dottrina), Fare (condotta) ed Essere (carattere). Spunta ciò che è già vero; clicca su una fase per passare a essa.",
+      pl:"Cała ścieżka na pierwszy rzut oka: pięć etapów u góry (Niewierzący, Nowo narodzony, Uczeń, Pracownik, Lider) i trzy obszary z boku — Wiedza (doktryna), Działanie (postępowanie) i Bycie (charakter). Zaznacz, co jest już prawdą; kliknij etap, aby do niego przejść.",
+      fa:"کل مسیر در یک نگاه: پنج مرحله در بالا (غیرایماندار، نوزاد، شاگرد، خادم، رهبر) و سه حوزه در کنار — شناخت (تعلیم)، عمل (رفتار) و بودن (شخصیت). آنچه از قبل صادق است را علامت بزن؛ روی نام مرحله کلیک کن تا به آن بروی."
     }
   },
   stagebar: {
@@ -2063,7 +2192,7 @@ var TOUR_KEY = "discipling-pathway-tour-v1";
   });
 })();
 
-// ---- session record card (name/date fields + print) ----
+// ---- session record card (name/date fields + print + add-to-calendar) ----
 var RECORD_KEY = "discipling-pathway-record-v1";
 var RECORD_FIELDS = ["rfDisciple","rfDiscipler","rfDate","rfNextSteps","rfDueDate"];
 (function initRecordCard(){
@@ -2073,6 +2202,13 @@ var RECORD_FIELDS = ["rfDisciple","rfDiscipler","rfDate","rfNextSteps","rfDueDat
     if (raw) saved = JSON.parse(raw) || {};
   } catch(e) { saved = {}; }
 
+  function updateCalVisibility(){
+    var dueEl = document.getElementById("rfDueDate");
+    var calAdd = document.getElementById("calAdd");
+    if (!dueEl || !calAdd) return;
+    calAdd.hidden = !dueEl.value;
+  }
+
   RECORD_FIELDS.forEach(function(id){
     var el = document.getElementById(id);
     if (!el) return;
@@ -2080,8 +2216,10 @@ var RECORD_FIELDS = ["rfDisciple","rfDiscipler","rfDate","rfNextSteps","rfDueDat
     el.addEventListener("input", function(){
       saved[id] = el.value;
       try { localStorage.setItem(RECORD_KEY, JSON.stringify(saved)); } catch(e) {}
+      if (id === "rfDueDate") updateCalVisibility();
     });
   });
+  updateCalVisibility();
 
   var printBtn = document.getElementById("printBtn");
   var statusEl = document.getElementById("printStatus");
@@ -2101,15 +2239,12 @@ var RECORD_FIELDS = ["rfDisciple","rfDiscipler","rfDate","rfNextSteps","rfDueDat
     });
   }
 
-  async function generatePdf(){
+  async function renderRecordPdf(){
     if (typeof html2canvas === "undefined" || !window.jspdf){
-      setStatus(t("statusToolsFailed"), true);
-      return;
+      var toolsErr = new Error("pdf-tools-unavailable");
+      toolsErr.code = "tools-failed";
+      throw toolsErr;
     }
-    printBtn.disabled = true;
-    printBtn.textContent = t("btnPreparing");
-    setStatus(t("statusRendering"));
-
     var target = document.querySelector(".wrap");
     var bg = getComputedStyle(document.body).backgroundColor;
     var canvas = await html2canvas(target, {
@@ -2123,27 +2258,27 @@ var RECORD_FIELDS = ["rfDisciple","rfDiscipler","rfDate","rfNextSteps","rfDueDat
     var pageHeight = pdf.internal.pageSize.getHeight();
     var imgWidth = pageWidth;
     var imgHeight = canvas.height * imgWidth / canvas.width;
-    var imgData = canvas.toDataURL("image/png");
+    var imgData = canvas.toDataURL("image/jpeg", 0.92);
 
     var heightLeft = imgHeight;
     var position = 0;
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
     while (heightLeft > 0){
       position -= pageHeight;
       pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
     }
 
     var blob = pdf.output("blob");
     var name = (document.getElementById("rfDisciple") || {}).value || "";
     var filename = "iDisciple" + (name ? "-" + name.replace(/[^a-z0-9]+/gi,"-") : "") + ".pdf";
+    return {blob: blob, filename: filename};
+  }
 
-    setStatus(t("statusWaiting"));
+  async function saveBlobAsDownload(blob, filename){
     var downloads = await (window.claude ? window.claude.use("downloads") : null);
-    printBtn.disabled = false;
-    printBtn.textContent = t("btnDownload");
     if (!downloads){
       // Outside claude.ai (e.g. GitHub Pages): ordinary browser download.
       try {
@@ -2152,22 +2287,183 @@ var RECORD_FIELDS = ["rfDisciple","rfDiscipler","rfDate","rfNextSteps","rfDueDat
         a.href = url; a.download = filename;
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-        setStatus(t("statusSaved"));
+        return true;
       } catch(err){
-        setStatus(t("statusUnavailable"), true);
+        return false;
       }
-      return;
     }
     try {
       await downloads.save({filename: filename, data: blob});
-      setStatus(t("statusSaved"));
+      return true;
     } catch(err){
-      if (err && err.code === "declined"){
-        setStatus("");
-      } else {
-        setStatus(t("statusRetry") + " (" + (err && err.code || "?") + ")", true);
-      }
+      if (err && err.code === "declined") return "declined";
+      throw err;
     }
+  }
+
+  async function generatePdf(){
+    printBtn.disabled = true;
+    printBtn.textContent = t("btnPreparing");
+    setStatus(t("statusRendering"));
+
+    var result;
+    try {
+      result = await renderRecordPdf();
+    } catch(e){
+      setStatus(t("statusToolsFailed"), true);
+      printBtn.disabled = false;
+      printBtn.textContent = t("btnDownload");
+      return;
+    }
+
+    setStatus(t("statusWaiting"));
+    var outcome = await saveBlobAsDownload(result.blob, result.filename);
+    printBtn.disabled = false;
+    printBtn.textContent = t("btnDownload");
+    if (outcome === "declined") setStatus("");
+    else if (outcome) setStatus(t("statusSaved"));
+    else setStatus(t("statusUnavailable"), true);
+  }
+
+  // ---- add to calendar: iCal gets the PDF embedded right in the file; ----
+  // ---- Google Calendar can't accept a file via URL, so it opens a prefilled ----
+  // ---- event while the PDF downloads separately for the user to attach. ----
+  function pad2(n){ return (n < 10 ? "0" : "") + n; }
+  function icsDateOnly(dateStr){ return dateStr.replace(/-/g, ""); }
+  function nextDayStr(dateStr){
+    var d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + 1);
+    return d.getFullYear() + "-" + pad2(d.getMonth()+1) + "-" + pad2(d.getDate());
+  }
+  function icsEscape(s){
+    return String(s || "").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/,/g,"\\,").replace(/;/g,"\\;");
+  }
+  function foldIcsLine(line){
+    var out = [];
+    var i = 0, first = true;
+    while (i < line.length){
+      var take = first ? 75 : 74;
+      out.push((first ? "" : " ") + line.slice(i, i + take));
+      i += take;
+      first = false;
+    }
+    return out;
+  }
+  function blobToBase64(blob){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(){
+        var result = reader.result || "";
+        var idx = result.indexOf(",");
+        resolve(idx === -1 ? result : result.slice(idx + 1));
+      };
+      reader.onerror = function(){ reject(reader.error || new Error("read-failed")); };
+      reader.readAsDataURL(blob);
+    });
+  }
+  function recordSummaryAndDetails(){
+    var discipleName = (document.getElementById("rfDisciple") || {}).value || "";
+    var nextSteps = (document.getElementById("rfNextSteps") || {}).value || "";
+    var summary = t("calEventTitle") + (discipleName ? " — " + discipleName : "");
+    return {summary: summary, nextSteps: nextSteps};
+  }
+  async function buildIcsText(dateStr, summary, description, pdfBlob, pdfFilename){
+    var uid = "discipling-pathway-" + Date.now() + "-" + Math.random().toString(36).slice(2) + "@idisciple";
+    var dtStamp = new Date().toISOString().replace(/[-:]/g,"").split(".")[0] + "Z";
+    var lines = [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//iDisciple//Session Record//EN",
+      "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "BEGIN:VEVENT",
+      "UID:" + uid, "DTSTAMP:" + dtStamp,
+      "DTSTART;VALUE=DATE:" + icsDateOnly(dateStr),
+      "DTEND;VALUE=DATE:" + icsDateOnly(nextDayStr(dateStr)),
+      "SUMMARY:" + icsEscape(summary)
+    ];
+    if (description) lines.push("DESCRIPTION:" + icsEscape(description));
+    if (pdfBlob){
+      var b64 = await blobToBase64(pdfBlob);
+      var attach = "ATTACH;ENCODING=BASE64;VALUE=BINARY;FMTTYPE=application/pdf;X-FILENAME=" + icsEscape(pdfFilename || "record.pdf") + ":" + b64;
+      lines = lines.concat(foldIcsLine(attach));
+    }
+    lines.push("END:VEVENT", "END:VCALENDAR");
+    return lines.join("\r\n") + "\r\n";
+  }
+  function googleCalUrl(dateStr, summary, description){
+    var params = new URLSearchParams();
+    params.set("action","TEMPLATE");
+    params.set("text", summary || "");
+    params.set("dates", icsDateOnly(dateStr) + "/" + icsDateOnly(nextDayStr(dateStr)));
+    if (description) params.set("details", description);
+    return "https://calendar.google.com/calendar/render?" + params.toString();
+  }
+
+  var calIcalBtn = document.getElementById("calIcalBtn");
+  var calGoogleBtn = document.getElementById("calGoogleBtn");
+  var calStatusEl = document.getElementById("calStatus");
+  function setCalStatus(msg, isError){
+    if (!calStatusEl) return;
+    calStatusEl.textContent = msg || "";
+    calStatusEl.classList.toggle("error", !!isError);
+  }
+  function setCalBusy(busy){
+    if (calIcalBtn) calIcalBtn.disabled = busy;
+    if (calGoogleBtn) calGoogleBtn.disabled = busy;
+  }
+
+  if (calIcalBtn){
+    calIcalBtn.addEventListener("click", function(){
+      handleAddToIcal().catch(function(err){
+        console.error(err);
+        setCalStatus(t("statusRetry"), true);
+        setCalBusy(false);
+      });
+    });
+  }
+  if (calGoogleBtn){
+    calGoogleBtn.addEventListener("click", function(){
+      handleAddToGoogle().catch(function(err){
+        console.error(err);
+        setCalStatus(t("statusRetry"), true);
+        setCalBusy(false);
+      });
+    });
+  }
+
+  async function handleAddToIcal(){
+    var dateStr = (document.getElementById("rfDueDate") || {}).value;
+    if (!dateStr) return;
+    setCalBusy(true);
+    setCalStatus(t("statusRendering"));
+    var result;
+    try { result = await renderRecordPdf(); }
+    catch(e){ setCalStatus(t("statusToolsFailed"), true); setCalBusy(false); return; }
+    var sd = recordSummaryAndDetails();
+    var ics = await buildIcsText(dateStr, sd.summary, sd.nextSteps, result.blob, result.filename);
+    var discipleName = (document.getElementById("rfDisciple") || {}).value || "";
+    var icsFilename = "iDisciple" + (discipleName ? "-" + discipleName.replace(/[^a-z0-9]+/gi,"-") : "") + ".ics";
+    var outcome = await saveBlobAsDownload(new Blob([ics], {type:"text/calendar"}), icsFilename);
+    setCalBusy(false);
+    if (outcome === "declined") setCalStatus("");
+    else if (outcome) setCalStatus(t("statusSaved"));
+    else setCalStatus(t("statusUnavailable"), true);
+  }
+
+  async function handleAddToGoogle(){
+    var dateStr = (document.getElementById("rfDueDate") || {}).value;
+    if (!dateStr) return;
+    var sd = recordSummaryAndDetails();
+    var description = (sd.nextSteps ? sd.nextSteps + "\n\n" : "") + t("calGooglePdfNote");
+    window.open(googleCalUrl(dateStr, sd.summary, description), "_blank", "noopener");
+
+    setCalBusy(true);
+    setCalStatus(t("statusRendering"));
+    var result;
+    try { result = await renderRecordPdf(); }
+    catch(e){ setCalStatus(t("statusToolsFailed"), true); setCalBusy(false); return; }
+    var outcome = await saveBlobAsDownload(result.blob, result.filename);
+    setCalBusy(false);
+    if (outcome === "declined") setCalStatus("");
+    else if (outcome) setCalStatus(t("calStatusGoogleSaved"));
+    else setCalStatus(t("statusUnavailable"), true);
   }
 })();
 
