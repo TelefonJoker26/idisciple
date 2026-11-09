@@ -314,6 +314,8 @@ footer.note b{ color:var(--ink); }
 .course-id{ flex:1 1 300px; min-width:0; }
 .course-card h3{ font-size:19px; font-weight:600; margin:0 0 3px; }
 .course-by{ font-size:12.5px; color:var(--ink-dim); }
+.course-web{ display:inline-block; margin-top:4px; font-size:12.5px; font-weight:700; color:var(--accent); text-decoration:none; }
+.course-web:hover{ text-decoration:underline; }
 .course-langs{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
 .course-langs .avail{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-dim); font-weight:700; margin-inline-end:2px; }
 .lchip{
@@ -415,6 +417,9 @@ footer.note b{ color:var(--ink); }
   margin-inline-start:6px;
 }
 .tour-btn:hover{ background:var(--accent); color:var(--accent-ink); }
+/* First visit: the one tour button is highlighted gold until the tour has been taken */
+.tour-btn.tour-new{ background:var(--gold-soft); border-color:var(--gold); color:var(--ink); }
+.tour-btn.tour-new:hover{ background:var(--gold); color:var(--ink); }
 .tour-hint{
   display:inline-flex; align-items:center; gap:2px; padding:3px 4px 3px 12px; border-radius:999px;
   background:var(--gold-soft); border:1px solid var(--gold); font-size:12.5px; font-weight:700; color:var(--ink);
@@ -475,7 +480,6 @@ footer.note b{ color:var(--ink); }
     <button type="button" class="lang-btn" data-lang="pl">&#127477;&#127473; PL</button>
     <button type="button" class="lang-btn" data-lang="fa">&#127470;&#127479; FA</button>
     <button type="button" class="tour-btn" id="tourBtn"></button>
-    <span class="tour-hint" id="tourHint" hidden><span id="tourHintText"></span><button type="button" id="tourHintX">&times;</button></span>
   </nav>
 
   <header class="top">
@@ -620,7 +624,7 @@ var TITLE_TR = {
   // Knowing / Doctrine
   "Assurance of salvation": {uk:"Впевненість у спасінні", de:"Heilsgewissheit", es:"Seguridad de la salvación", it:"Certezza della salvezza", pl:"Pewność zbawienia", fa:"اطمینان از نجات"},
   "Deity of Christ": {uk:"Божественність Христа", de:"Gottheit Christi", es:"Deidad de Cristo", it:"Divinità di Cristo", pl:"Bóstwo Chrystusa", fa:"الوهیت مسیح"},
-  "Eternal security": {uk:"Вічна безпека", de:"Ewige Bewahrung", es:"Seguridad eterna", it:"Sicurezza eterna", pl:"Wieczne bezpieczeństwo", fa:"امنیت ابدی"},
+  "Eternal security": {uk:"Вічна безпека", de:"Ewige Sicherheit", es:"Seguridad eterna", it:"Sicurezza eterna", pl:"Wieczne bezpieczeństwo", fa:"امنیت ابدی"},
   "Holiness": {uk:"Святість", de:"Heiligung", es:"Santidad", it:"Santità", pl:"Świętość", fa:"قدوسیت"},
   "Holy Spirit": {uk:"Святий Дух", de:"Heiliger Geist", es:"Espíritu Santo", it:"Spirito Santo", pl:"Duch Święty", fa:"روح‌القدس"},
   "Authority of Word of God": {uk:"Авторитет Слова Божого", de:"Autorität des Wortes Gottes", es:"Autoridad de la Palabra de Dios", it:"Autorità della Parola di Dio", pl:"Autorytet Słowa Bożego", fa:"اقتدار کلام خدا"},
@@ -792,6 +796,8 @@ function fillTemplate(tpl, vals){
 // flags a first-pass guess rather than a confirmed match. Lines that look like a
 // Bible reference or a named resource are auto-linked at render time (see
 // resourceLink()) — to Bible Gateway, or to a Drive search in your iDisciple folder.
+// A line ending in a web address ("Title — https://…") links straight to that address,
+// and only the title is shown — use this for resources anyone can download themselves.
 var CHAR_TIM = "1 Tim 3:1–13";
 var CHAR_TITUS = "Titus 1:5–9";
 
@@ -817,7 +823,7 @@ var ITEMS = [
   {stage:"leader", division:"character", title:"Faith and prayer", r:[CHAR_TIM, CHAR_TITUS, "Building Convictions — “3. Pray”", "Building Convictions — “Mountain, moving faith”"]},
 
   // ---- LEARN (Doctrine) ----
-  {stage:"nb", division:"learn", title:"Assurance of salvation", r:["New Life Bible Studies 1.3–1.5 — The process of salvation (LifeinChrist)", "New Life PDFs — “Beginning in Christ” booklet (EN/DE)"]},
+  {stage:"nb", division:"learn", title:"Assurance of salvation", r:["New Life Bible Studies 1.3–1.5 — The process of salvation (LifeinChrist)", "New Life Ames — “Beginning in Christ” booklet (EN/DE)"]},
   {stage:"disciple", division:"learn", title:"Deity of Christ", r:["New Life Bible Studies 0.1 — The Person Jesus (nlbs0_1.doc)"]},
   {stage:"disciple", division:"learn", title:"Eternal security", r:["New Life Bible Studies 1.3–1.5 — The process of salvation (same studies as Assurance of Salvation) (LifeinChrist)"]},
   {stage:"disciple", division:"learn", title:"Holiness", r:["New Life Bible Studies 4.1 — The call to live holy lives (BeYeHoly1.PDF)", "“Be Ye Holy” study series, parts 1–5"]},
@@ -843,7 +849,7 @@ var ITEMS = [
   {stage:"disciple", division:"practice", title:"Serving", r:["New Life Bible Studies 8.2 — Being a sacrificial servant (Serving2.PDF)", "“Serving” study series, parts 1–5"]},
   {stage:"disciple", division:"practice", title:"Giving (tithing)", r:["New Life Bible Studies 6.4 — Giving / rejoicing / worship (Maturity4.PDF)", "Building Convictions — “18. Giving”"]},
   {stage:"disciple", division:"practice", title:"Victory over sin", r:["New Life Bible Studies 4.5 — Steps to wholeness: walking in victory (BeYeHoly5.PDF)", "New Life Bible Studies 8.3 — The spiritual battle (Serving3.PDF)", "Building Convictions — “11. Victory”", "Building Convictions — “16. Weapons”"]},
-  {stage:"disciple", division:"practice", title:"Discover spiritual gift", r:["New Life Bible Studies 8.4 — Using your spiritual gifts to serve others (Serving4.PDF)"]},
+  {stage:"disciple", division:"practice", title:"Discover spiritual gift", r:["New Life Bible Studies 8.4 — Using your spiritual gifts to serve others (Serving4.PDF)", "Lifeway Spiritual Gifts Survey (free PDF, 80 statements) — https://assets.lifeway.com/image/upload/SpiritualGiftsStudy-Surveypdf.pdf"]},
   {stage:"worker", division:"practice", title:"Extended time with God", r:["New Life Bible Studies 6.1–6.3, deepened (Maturity)"]},
   {stage:"worker", division:"practice", title:"Discipling", r:["This project itself — New Life Bible Studies 10.4 — The example of the early church (TheGC4.PDF)"]},
   {stage:"worker", division:"practice", title:"Co-laboring / unity", r:["New Life Bible Studies 10.3 — The example of the Apostle Paul (TheGC3.PDF)", "Building Convictions — “5. Resolving tension”"]},
@@ -1043,8 +1049,23 @@ var DRIVE_RULES = [
   {test:/\(([A-Za-z]+)\)\s*$/, qFrom:1},
   {test:/New Life Bible Studies/i, q:"NLBS"}
 ];
+// Published books and outside courses: link to the official site (never host the
+// files). Used both for chart resource lines and for the Resources cards.
+var WEB_LINKS = [
+  {test:/Case for Christ/i,    url:"https://leestrobel.com/",                  label:"getBook",   course:"caseforchrist"},
+  {test:/God Hypothesis/i,     url:"https://returnofthegodhypothesis.com/",    label:"getBook",   course:"godhypothesis"},
+  {test:/^Alpha Course/i,      url:"https://alpha.org/",                       label:"visitSite", course:"alpha"}
+];
+function webLinkForCourse(id){
+  for (var i=0;i<WEB_LINKS.length;i++) if (WEB_LINKS[i].course === id) return WEB_LINKS[i];
+  return null;
+}
+var URL_TAIL_RE = /\s*(?:[—–-]\s*)?(https?:\/\/\S+)\s*$/;
 function resourceLink(text){
   var t = text.trim();
+  var u = t.match(URL_TAIL_RE);
+  if (u) return u[1];
+  for (var w=0; w<WEB_LINKS.length; w++){ if (WEB_LINKS[w].test.test(t)) return WEB_LINKS[w].url; }
   if (BIBLE_LINE_RE.test(t)){
     return "https://www.biblegateway.com/passage/?search=" + encodeURIComponent(t) + "&version=ESV";
   }
@@ -1061,7 +1082,7 @@ function resourceLink(text){
 function resLineHtml(line, extraClass){
   var href = resourceLink(line);
   var cls = "res-line" + (extraClass ? " " + extraClass : "");
-  var displayText = /^add a resource$/i.test(line) ? t("addResource") : line;
+  var displayText = /^add a resource$/i.test(line) ? t("addResource") : line.replace(URL_TAIL_RE, "");
   var body = escapeHtml(displayText);
   if (href){
     return '<div class="'+cls+'"><a href="'+href+'" target="_blank" rel="noopener noreferrer">'+body+'</a></div>';
@@ -1202,6 +1223,8 @@ var COURSE_UI = {
   clearFilter: {en:"Clear", uk:"Скинути", de:"Zurücksetzen", es:"Quitar", it:"Rimuovi", pl:"Wyczyść", fa:"پاک کردن"},
   ccBtn: {en:"Courses covering this ({n}) ›", uk:"Курси, що це охоплюють ({n}) ›", de:"Kurse dazu ({n}) ›", es:"Cursos que lo cubren ({n}) ›", it:"Corsi che lo coprono ({n}) ›", pl:"Kursy na ten temat ({n}) ›", fa:"دوره‌های مرتبط ({n}) ›"},
   noCourses: {en:"No course in the library covers this yet.", uk:"Жоден курс у бібліотеці поки що цього не охоплює.", de:"Noch kein Kurs in der Bibliothek deckt das ab.", es:"Ningún curso de la biblioteca cubre esto todavía.", it:"Nessun corso della biblioteca copre ancora questo.", pl:"Żaden kurs w bibliotece jeszcze tego nie obejmuje.", fa:"هنوز هیچ دوره‌ای در کتابخانه این را پوشش نمی‌دهد."},
+  getBook: {en:"Get the book ›", uk:"Де придбати книгу ›", de:"Buch besorgen ›", es:"Conseguir el libro ›", it:"Dove trovare il libro ›", pl:"Gdzie zdobyć książkę ›", fa:"تهیه کتاب"},
+  visitSite: {en:"Visit the website ›", uk:"Перейти на сайт ›", de:"Zur Website ›", es:"Ir al sitio web ›", it:"Vai al sito ›", pl:"Przejdź do strony ›", fa:"رفتن به وب‌سایت"},
   approxBadge: {en:"rough mapping", uk:"приблизне зіставлення", de:"grobe Zuordnung", es:"correspondencia aproximada", it:"corrispondenza approssimativa", pl:"przybliżone dopasowanie", fa:"تطبیق تقریبی"},
   sessionNoun: {en:"session", uk:"сесія", de:"Einheit", es:"sesión", it:"incontro", pl:"spotkanie", fa:"جلسه"}
 };
@@ -1450,7 +1473,7 @@ var COURSES = [
     ]}]
   },
   {
-    id:"lifenow", title:"Life Now Bible Exploration — Begin / Grow / Mature in Christ",
+    id:"lifenow", title:"New Life Ames — Begin / Grow / Mature in Christ",
     by:"3 booklets · English and German",
     approx:true,
     blurb:"Three booklets from Great Commission Churches that take a person from meeting Christ, through growing in fellowship and Christ-like living, to maturing, sharing the new life and multiplying. Available in German as Teil 1–3.",
@@ -1646,7 +1669,9 @@ function courseCardHtml(c, m, eff){
     : fillTemplate(t("sessionsCount"), {n:c.an.n});
   var h = '<article class="course-card" id="course-'+c.id+'">' +
     '<div class="course-head"><div class="course-id"><h3>'+escapeHtml(c.title)+'</h3>' +
-    '<div class="course-by">'+escapeHtml(c.by)+(c.approx ? ' · <span class="lang-badge off">'+escapeHtml(t("approxBadge"))+'</span>' : "")+'</div></div>' +
+    '<div class="course-by">'+escapeHtml(c.by)+(c.approx ? ' · <span class="lang-badge off">'+escapeHtml(t("approxBadge"))+'</span>' : "")+'</div>' +
+    (function(){ var wl = webLinkForCourse(c.id); return wl ? '<a class="course-web" href="'+wl.url+'" target="_blank" rel="noopener noreferrer">'+escapeHtml(t(wl.label))+'</a>' : ""; })() +
+    '</div>' +
     '<div class="course-langs" title="'+escapeHtml(t("availIn"))+'"><span class="avail">'+escapeHtml(t("availIn"))+'</span>'+chips+'</div></div>' +
     (warn ? '<div class="lang-warn">'+escapeHtml(warn)+'</div>' : "") +
     '<p class="course-blurb">'+escapeHtml(c.blurb)+'</p>' +
@@ -2156,12 +2181,13 @@ function tourPlace(){
 }
 
 function tourHideHint(){
-  var h = document.getElementById("tourHint");
-  if (h) h.hidden = true;
+  var b = document.getElementById("tourBtn");
+  if (b) b.classList.remove("tour-new");
+  applyTourI18n();
 }
 function applyTourI18n(){
   var b = document.getElementById("tourBtn");
-  if (b) b.textContent = "❓ " + t("tourBtn");
+  if (b) b.textContent = "❓ " + t(b.classList.contains("tour-new") ? "tourHint" : "tourBtn");
   var ht = document.getElementById("tourHintText");
   if (ht) ht.textContent = t("tourHint");
   var hx = document.getElementById("tourHintX");
@@ -2173,16 +2199,11 @@ var TOUR_KEY = "discipling-pathway-tour-v1";
   var seen = false;
   try { seen = !!localStorage.getItem(TOUR_KEY); } catch(e) {}
   var btn = document.getElementById("tourBtn");
-  var hint = document.getElementById("tourHint");
-  if (hint) hint.hidden = seen;
-  if (btn) btn.addEventListener("click", tourStart);
-  var hint2 = document.getElementById("tourHintText");
-  if (hint2) hint2.addEventListener("click", tourStart);
-  var hx = document.getElementById("tourHintX");
-  if (hx) hx.addEventListener("click", function(){
-    try { localStorage.setItem(TOUR_KEY, "1"); } catch(e) {}
-    tourHideHint();
-  });
+  if (btn){
+    if (!seen) btn.classList.add("tour-new");
+    btn.addEventListener("click", tourStart);
+    applyTourI18n();
+  }
   document.addEventListener("keydown", function(e){
     if (!tour.active) return;
     var rtl = RTL_LANGS.indexOf(currentLang) !== -1;
