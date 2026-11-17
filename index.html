@@ -814,12 +814,12 @@ var ITEMS = [
   {stage:"worker", division:"character", title:"Faithful in spiritual areas", r:[CHAR_TIM, CHAR_TITUS, "Building Convictions — “14. Filled, walking”"]},
   {stage:"worker", division:"character", title:"Vision to be used by God", r:[CHAR_TIM, CHAR_TITUS]},
   {stage:"worker", division:"character", title:"Servant's heart", r:[CHAR_TIM, CHAR_TITUS, "New Life Bible Studies 8.1 — Being others oriented (Serving1.PDF)"]},
-  {stage:"worker", division:"character", title:"Submission", r:[CHAR_TIM, CHAR_TITUS]},
-  {stage:"worker", division:"character", title:"Hospitable", r:[CHAR_TIM, CHAR_TITUS, "Building Convictions — “21. Hospitality”"]},
-  {stage:"leader", division:"character", title:"Above reproach", r:[CHAR_TIM, CHAR_TITUS, "Titus 1:6–7"]},
+  {stage:"worker", division:"character", title:"Submission", r:[CHAR_TIM, CHAR_TITUS, "Elder Qualification Test — Q. Not self-willed (verify)"]},
+  {stage:"worker", division:"character", title:"Hospitable", r:[CHAR_TIM, CHAR_TITUS, "Elder Qualification Test — F. Hospitable", "Building Convictions — “21. Hospitality”"]},
+  {stage:"leader", division:"character", title:"Above reproach", r:[CHAR_TIM, CHAR_TITUS, "Titus 1:6–7", "Elder Qualification Test — A. Above reproach; P. Good reputation with those outside"]},
   {stage:"leader", division:"character", title:"A pacesetter", r:[CHAR_TIM, CHAR_TITUS]},
   {stage:"leader", division:"character", title:"A shepherd's heart", r:[CHAR_TIM, CHAR_TITUS, "1 Peter 5:2–4"]},
-  {stage:"leader", division:"character", title:"Wisdom / discernment", r:[CHAR_TIM, CHAR_TITUS]},
+  {stage:"leader", division:"character", title:"Wisdom / discernment", r:[CHAR_TIM, CHAR_TITUS, "Elder Qualification Test — D. Prudent or Sensible (verify)"]},
   {stage:"leader", division:"character", title:"Faith and prayer", r:[CHAR_TIM, CHAR_TITUS, "Building Convictions — “3. Pray”", "Building Convictions — “Mountain, moving faith”"]},
 
   // ---- LEARN (Doctrine) ----
@@ -835,9 +835,9 @@ var ITEMS = [
   {stage:"worker", division:"learn", title:"Second coming", r:["New Life Bible Studies 7.3 — Christ's return and the rapture (GodsValues3.PDF)", "Building Convictions — “20. Loving his appearing”"]},
   {stage:"worker", division:"learn", title:"Apologetics", r:["add a resource"]},
   {stage:"worker", division:"learn", title:"False doctrine", r:["add a resource"]},
-  {stage:"leader", division:"learn", title:"Sound doctrine", r:["Titus 1:9", "add a resource"]},
+  {stage:"leader", division:"learn", title:"Sound doctrine", r:["Titus 1:9", "Elder Qualification Test — W. Holding fast to the faithful word"]},
   {stage:"leader", division:"learn", title:"Deep convictions", r:["Building Convictions series (20 studies) — whole series"]},
-  {stage:"leader", division:"learn", title:"Able to refute wrong doctrine", r:["Titus 1:9", "add a resource"]},
+  {stage:"leader", division:"learn", title:"Able to refute wrong doctrine", r:["Titus 1:9", "Elder Qualification Test — W. Able to refute those who contradict"]},
 
   // ---- PRACTICE (Conduct) ----
   {stage:"nb", division:"practice", title:"Quiet Time", r:["New Life Bible Studies 6.1 — The daily quiet time (Maturity1.PDF)"]},
@@ -856,11 +856,11 @@ var ITEMS = [
   {stage:"worker", division:"practice", title:"Sacrificial lifestyle", r:["New Life Bible Studies 8.1–8.2 — Being others oriented; being a sacrificial servant (Serving)"]},
   {stage:"worker", division:"practice", title:"Giving and receiving reproof", r:["add a resource"]},
   {stage:"worker", division:"practice", title:"Develop spiritual gift", r:["New Life Bible Studies 8.5 — Using your spiritual gifts to serve others, continued (Serving5.PDF)"]},
-  {stage:"leader", division:"practice", title:"Teaching", r:["add a resource"]},
+  {stage:"leader", division:"practice", title:"Teaching", r:["Elder Qualification Test — G. Able to Teach"]},
   {stage:"leader", division:"practice", title:"Preaching", r:["add a resource"]},
-  {stage:"leader", division:"practice", title:"Exhorting (motivating)", r:["add a resource"]},
+  {stage:"leader", division:"practice", title:"Exhorting (motivating)", r:["Elder Qualification Test — W. Able to exhort in sound doctrine (verify)"]},
   {stage:"leader", division:"practice", title:"Counseling", r:["add a resource"]},
-  {stage:"leader", division:"practice", title:"Managing one's household", r:["1 Tim 3:4–5", "Titus 1:6", "Herschel Training Books — Book 3, “Design and Purpose of the Family”"]},
+  {stage:"leader", division:"practice", title:"Managing one's household", r:["1 Tim 3:4–5", "Titus 1:6", "Herschel Training Books — Book 3, “Design and Purpose of the Family”", "Elder Qualification Test — M. Manages his household well; N. Keeps his children under control"]},
   {stage:"leader", division:"practice", title:"Administration", r:["add a resource"]},
   {stage:"leader", division:"practice", title:"Overseeing", r:["1 Tim 3:1", "Herschel Training Books — Book 3, “Design and Purpose of the Church”"]},
   // --- Unbeliever stage: apologetics and first steps toward faith
@@ -1025,6 +1025,7 @@ function escapeHtml(s){
 // returns null for plain notes ("add a resource") that aren't a real target yet.
 var BIBLE_LINE_RE = /^[1-3]?\s?[A-Za-z]+(?:\s[A-Za-z]+)?\s\d{1,3}:\d{1,3}(?:[–-]\d{1,3})?$/;
 var DRIVE_RULES = [
+  {test:/Elder Qualification Test/i, q:"Elder Qualification Test"},
   {test:/Be Ye Holy/i, q:"BeYeHoly"},
   {test:/Holy Spirit.*study series/i, q:"HolySpirit"},
   {test:/The Church.*study series/i, q:"TheChurch"},
